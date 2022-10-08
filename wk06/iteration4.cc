@@ -21,4 +21,9 @@ void printReverse(const list<int>& lst)
   */
 
   // ADD YOUR CODE HERE
+    list<int>::const_reverse_iterator iteraattori = lst.rbegin();
+    
+    for(; iteraattori != lst.rend(); ++iteraattori)
+        cout << *iteraattori << " ";
+    cout << endl;
 }

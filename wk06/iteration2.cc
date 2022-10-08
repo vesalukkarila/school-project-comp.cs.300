@@ -21,4 +21,13 @@ void printEverySecond(const list<int>& lst)
   */
 
   // ADD YOUR CODE HERE
+    
+    list<int>::const_iterator iteraattori = lst.begin();
+    for(;iteraattori != lst.end(); advance(iteraattori, 2)){
+        cout << *iteraattori << " ";
+
+        if (iteraattori == --lst.end()  )
+            return;
+            
+    }
 }

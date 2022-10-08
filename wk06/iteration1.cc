@@ -21,4 +21,9 @@ void printAllItems(const list<int>& lst)
   */
 
   // ADD YOUR CODE HERE
+    list<int>::const_iterator iteraattori = lst.begin();
+    for (;iteraattori != lst.end(); ++iteraattori) {
+        cout << *iteraattori << " " ;
+    }
+    cout << endl;
 }
