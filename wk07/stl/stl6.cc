@@ -18,11 +18,10 @@ using namespace std;
 
 int findAtLeastGiven(std::map<std::string, int>& m, int given)
 {
-    auto search =  [&given ](pair <string, int>& m){return m.second >= given;};
-    auto result = find(m.begin(), m.end(), search);
+    auto search =  [&given ](pair <string, int> m){return m.second >= given;};
+    auto result = find_if(m.begin(), m.end(), search);
     if (result != m.end())
         return result->second;
     return NOT_FOUND;
 }
-
 
