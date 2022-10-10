@@ -2,7 +2,7 @@
 #include <vector>
 #include <algorithm>
 
-int sortAsc(std::vector<int>& v)
+int sortDesc(std::vector<int>& v)
 {
 
     sort(v.rbegin(), v.rend());
