@@ -19,8 +19,7 @@ int removeLessThan(std::vector<int>& v, int limit)
     auto remove = [&limit](int a){return a<limit;};
     auto iteraattori = remove_if(v.begin(), v.end(), remove);
     v.erase(iteraattori, v.end());
-    //for (auto a:v)
-        //cout << a<< endl;
+   
     return EXIT_SUCCESS;
 }
 
