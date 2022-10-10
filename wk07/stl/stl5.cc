@@ -16,10 +16,12 @@ using namespace std;
 int sortMod3(std::vector<int>& v)
 
 {
+    if (v.size() == 0)
+        return EXIT_FAILURE;
     sort(v.begin(), v.end());
     auto result = [](int a, int b){return a%3 < b%3;} ;
     sort(v.begin(), v.end(), result);
   
 
-  return EXIT_FAILURE;
+  return EXIT_SUCCESS;
 }
