@@ -2,17 +2,15 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
-
-/**
- * @brief sort a given vector to an descending order
- *
- * @param v a vector to be sorted
- * @return int EXIT_SUCCESS if everything went OK, EXIT_FAILURE otherwise
- */
-int sortDesc(std::vector<int>& v)
+int sortAsc(std::vector<int>& v)
 {
-  return EXIT_FAILURE;
+
+    sort(v.rbegin(), v.rend());
+
+
+    if (is_sorted(v.rbegin(), v.rend()))
+        return EXIT_SUCCESS;
+    else
+        return EXIT_FAILURE;
 }
 
