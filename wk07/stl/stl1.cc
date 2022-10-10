@@ -17,9 +17,6 @@ int sortAsc(std::vector<int>& v)
 
     sort(v.begin(), v.end());
 
-    for (auto a:v)
-        cout <<  a << endl;
-
     if (is_sorted(v.begin(), v.end()))
         return EXIT_SUCCESS;
     else
