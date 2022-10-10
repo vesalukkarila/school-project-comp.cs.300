@@ -14,7 +14,13 @@ using namespace std;
  * @return int EXIT_SUCCESS if everything went OK, EXIT_FAILURE otherwise
  */
 int sortMod3(std::vector<int>& v)
+
 {
+    sort(v.begin(), v.end());
+    auto result = [](int a, int b){return a%3 < b%3;} ;
+    sort(v.begin(), v.end(), result);
+    for (auto a : v)
+        cout << a << endl;
+
   return EXIT_FAILURE;
 }
-
