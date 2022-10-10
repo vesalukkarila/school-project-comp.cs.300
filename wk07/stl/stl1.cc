@@ -1,6 +1,7 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -13,6 +14,16 @@ using namespace std;
  */
 int sortAsc(std::vector<int>& v)
 {
-  return EXIT_FAILURE;
+
+    sort(v.begin(), v.end());
+
+    for (auto a:v)
+        cout <<  a << endl;
+
+    if (is_sorted(v.begin(), v.end()))
+        return EXIT_SUCCESS;
+    else
+        return EXIT_FAILURE;
 }
+
 
