@@ -16,6 +16,25 @@ void doubleEvenRemoveUneven(std::vector<int>& vec) {
 
     Iter begin = vec.begin();
     Iter end = vec.end();
+    vector<int> apu;
+
+    for ( Iter it = begin; it < end; it++){
+        if ( *it % 2 == 0 )
+            *it *= 2;
+        else
+            apu.push_back(*it);
+    }
+    for (auto val : apu){
+        vector<int>::iterator it = find(begin, end, val);
+
+        if ( it != end)
+            vec.erase(it);
+    }
+
+
+
+
+    /* ALKUPERÄINEN
     for ( Iter it = begin; it < end; it++){
         if ( *it % 2 == 0 ){
             vec.insert(it, *it);
@@ -27,5 +46,6 @@ void doubleEvenRemoveUneven(std::vector<int>& vec) {
             it--;
         }
     }
+    */
 }
 
