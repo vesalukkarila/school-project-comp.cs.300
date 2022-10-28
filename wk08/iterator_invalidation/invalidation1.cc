@@ -1,7 +1,8 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
-
+#include <string>
+#include <iostream>
 using namespace std;
 
 
@@ -11,9 +12,12 @@ using namespace std;
  * @param n the size of the vector to be created
  */
 std::vector<int> ascendingVector(int n) {
+
     std::vector<int> v;
     auto beg1 = v.begin();
-    for (int i = 0; i < n; ++i) { v.insert(beg1+1, i); }
+    for (int i = 0; i < n; ++i) { //{v.insert(beg1+1, i); }
+        v.push_back(i);
+    }
 
     return v;
 }
