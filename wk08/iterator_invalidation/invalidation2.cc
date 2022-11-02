@@ -9,7 +9,10 @@ using namespace std;
  * @brief Erases every second item from the vector. Example: {1, 2, 3, 4} -> {1, 3}
  *
  * @param vec vector where every second item is erased.
- * KATO MITEN TÄÄ TEHTÄVÄ ON MUUT TEHNYT
+ *
+ *
+ * ------------TÖNKKÖ vaikka toimiva TOTEUTUS apuvektorilla SAA VARMAAN ALGORITMILLA REMOVE JA ERASE SUORAAN
+ * -------------KATO MITEN TÄÄ TEHTÄVÄ ON MUUT TEHNYT---------------
  */
 void eraseEverySecond(std::vector<int>& vec) {
     auto beg = vec.begin();
@@ -35,9 +38,5 @@ void eraseEverySecond(std::vector<int>& vec) {
     { vec.erase(i); }
 */
 
-
-
-    /*for (auto n : apu)
-        cout << n << endl;*/
 }
 
