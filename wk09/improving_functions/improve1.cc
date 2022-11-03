@@ -13,7 +13,7 @@ std::vector<int> ascendingVector(int n){
     std::vector<int> v;
     int i = 0;
     // push_back() amortized constant O(n)
-    while (  i<n) {     //O(n)
+    while (  i!= n) {     //O(n), muutettu != koska vertailee vain onko sama vai ei
         v.push_back(i);             // a.constant
         ++i;
     }
