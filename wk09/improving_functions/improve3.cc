@@ -1,8 +1,11 @@
 #include <iterator>
+#include <numeric>
 #include <vector>
 #include <map>
 #include <algorithm>
-
+#include<functional>
+#include <iostream>
+using namespace  std;
 
 /**
  * @brief Sums up the values of the vector cumulatively, storing cumulative sum
@@ -15,12 +18,22 @@
  *         a map as values, vector values used as keys.
  */
 std::map<int, int> cumulativeSums(std::vector<int> v) {
-    std::map<int,int> sums;
-    for (unsigned int i=0; i<v.size(); ++i) {
-        if (sums.empty())
-        { sums[v[i]] = v[i]; }
-        else
-        { sums[v[i]] = sums.at(v[i-1]) + v[i]; }
+
+    std::map<int,int> sums; //ok
+
+    vector<int>::iterator b = v.begin();
+
+    vector<int>::iterator it = v.begin();
+    while (it != v.end()) {
+
+        sums[*it] = accumulate(b, it+1, 0);
+        ++it;
+
+
     }
+    for (auto n : sums)
+        cout << n.first << " ja " << n.second << endl;
+
+
     return sums;
 }
