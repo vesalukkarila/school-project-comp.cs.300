@@ -11,12 +11,12 @@ using namespace std;
  */
 std::vector<int> ascendingVector(int n){
     std::vector<int> v;
-
+    int i = 0;
     // push_back() amortized constant O(n)
-    for ( int i = 0; i<n; ++i)      //O(n)
+    while (  i<n) {     //O(n)
         v.push_back(i);             // a.constant
-
-
+        ++i;
+    }
 
     return v;
 }
