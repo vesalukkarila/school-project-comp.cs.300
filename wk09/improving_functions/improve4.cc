@@ -24,7 +24,6 @@ void randomizedThreePartQuicksort(iter begin, iter end, RNG& rng)
 {
     if (begin == end) return;
 
-    std::shuffle(begin, end, rng);
 
     auto pivot = *(begin + (end - begin)/2);
     iter middle1 = std::partition(begin, end,
