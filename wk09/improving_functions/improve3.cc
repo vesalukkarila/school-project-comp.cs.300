@@ -17,23 +17,22 @@ using namespace  std;
  * @return std::map<int, int> sums - the sums of each cumulation stored in
  *         a map as values, vector values used as keys.
  */
+
+
 std::map<int, int> cumulativeSums(std::vector<int> v) {
 
     std::map<int,int> sums; //ok
 
-    vector<int>::iterator b = v.begin();
+    for (unsigned int i=0; i<v.size(); ++i) {   //tehokkaampaa tapaa loopata? vertailu ulkopuolella, !=, while ehkä, koska nyt i:n arvo jatkuvassa käytössä
+        //while (v.begin() != v.end() ?
+        if (sums.empty())       //jos map tyhjä..
+        { sums[v[i]] = v[i]; }  //luodaan avain-arvopari, tehokkaampi tapa luoda pari? päästä käsiksi avaimeen/arvoon
 
-    vector<int>::iterator it = v.begin();
-    while (it != v.end()) {
-
-        sums[*it] = accumulate(b, it+1, 0);
-        ++it;
-
+        else
+        { sums[v[i]] = sums.at(v[i-1]) + v[i]; }    //tehokkaampaa tapaa päästä käsiksi avaimeen, summaus vektori
 
     }
-    for (auto n : sums)
-        cout << n.first << " ja " << n.second << endl;
-
 
     return sums;
 }
+
