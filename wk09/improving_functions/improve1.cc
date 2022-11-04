@@ -13,8 +13,9 @@ using namespace std;
 
 //Tiiä mitä vittua täsä pitäs vielä hinkata
 std::vector<int> ascendingVector(int n){
-    std::vector<int> v(n-1);
+    std::vector<int> v(n);
     iota(v.begin(), v.end(), 0);
+
 
 
 
