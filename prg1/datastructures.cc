@@ -28,54 +28,103 @@ Type random_in_range(Type start, Type end)
 // an operation (Commenting out parameter name prevents compiler from
 // warning about unused parameters on operations you haven't yet implemented.)
 
-Datastructures::Datastructures()
+Datastructures::Datastructures():
+stations_umap_()
+
 {
-    // Write any initialization you need here
+
 }
+
 
 Datastructures::~Datastructures()
 {
     // Write any cleanup you need here
 }
 
+
+
+
 unsigned int Datastructures::station_count()
-{
-    // Replace the line below with your implementation
-    throw NotImplemented("station_count()");
+{    
+    return stations_umap_.size();
 }
 
+
+
+
+//LISÄÄ TÄHÄN REGIONIN TYHJENNYS
+//Ei mukana tehokkuuskisoissa
 void Datastructures::clear_all()
 {
-    // Replace the line below with your implementation
-    throw NotImplemented("clear_all()");
+    stations_umap_.clear();
 }
 
+
+//Ok, pitäs olla
+//Ei mukana tehokkuuskisoissa, mielivaltainen järjestys.
+//Pitääkö olla &station_umap_, tekeekö paikallisen kopion attribuutista ilman &-merkkiä????????
 std::vector<StationID> Datastructures::all_stations()
 {
-    // Replace the line below with your implementation
-    throw NotImplemented("all_stations()");
+    vector<StationID> station_vector;
+    for (auto& key : stations_umap_)
+        station_vector.push_back(key.first);
+    return station_vector;
 }
 
-bool Datastructures::add_station(StationID /*id*/, const Name& /*name*/, Coord /*xy*/)
+
+
+//Tehty miettimättä tiedostosta lukua
+// Ei salli &, en tiedä onko tarpeenkaan, pää menee sekaisin kohta semantiikasta
+bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("add_station()");
+    station_struct value = {id, name, xy};
+    bool insert_ok = stations_umap_.insert({id, value}).second; //second palauttaa booleanin jos onnistui, first palautti iteraattorin kohtaan joka esti tai missä onnistui
+    if ( insert_ok )
+        return true;
+    return false;
+
+
+
 }
 
-Name Datastructures::get_station_name(StationID /*id*/)
+
+
+
+//KUTSUTAAN USEIN, OPTIMOINTIA VAATINEE. find, contains, count,
+//Sama minkä ottaa niin const ja & jottei kopioi
+//Tarviiko attribuutti_umap olla viite, voiko olla, kopioiko koko attribuutin kun käyttää algoritmia jos ei ole &?????
+Name Datastructures::get_station_name(StationID id)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("get_station_name()");
+    //find, laitettu vain viite etsittävän eteen
+    auto search = stations_umap_.find(id);
+    if (search != stations_umap_.end())
+        return search->second.name;
+    return NO_NAME;
+
+
 }
 
-Coord Datastructures::get_station_coordinates(StationID /*id*/)
+
+
+//USEIN
+//Jos korjattavaa niin korjaa ylläoleva myös, samat toiminnot
+Coord Datastructures::get_station_coordinates(StationID id)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("get_station_coordinates()");
+    auto search = stations_umap_.find(id);
+    if (search != stations_umap_.end())
+        return search->second.coordinates;
+    return NO_COORD;
 }
+
+
+
+
+
+
+
+
+
+// We recommend you implement the operations below only after implementing the ones above
 
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
@@ -124,6 +173,9 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
     throw NotImplemented("station_departures_after()");
 }
 
+
+// We recommend you implement the operations below only after implementing the ones above
+
 bool Datastructures::add_region(RegionID /*id*/, const Name &/*name*/, std::vector<Coord> /*coords*/)
 {
     // Replace the line below with your implementation
@@ -171,6 +223,9 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID /*id*/)
     // Also uncomment parameters ( /* param */ -> param )
     throw NotImplemented("station_in_regions()");
 }
+
+
+// EI-PAKOLLISET Non-compulsory operations
 
 std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID /*id*/)
 {

@@ -14,13 +14,26 @@
 #include <limits>
 #include <functional>
 #include <exception>
+#include <unordered_map>
 
+using namespace std;
 // Types for IDs
+
+//Käytetään asemanyksilöivänä tunnisteena
 using StationID = std::string;
-using TrainID = std::string;
-using RegionID = unsigned long long int;
+
+//Käytetään asemien ja alueiden nimenä
 using Name = std::string;
+
+//Ei-negatiivinen kokonaisluku, jota käytetään alueen yksilöivänä tunnisteena
+using RegionID = unsigned long long int;
+
+// käytetään junan yksilöivänä tunnisteena
+using TrainID = std::string;
+
+//Kokonaisluku, joka kuvaa kellonaikaa muodossa HHMM.
 using Time = unsigned short int;
+
 
 // Return values for cases where required thing was not found
 StationID const NO_STATION = "---";
@@ -124,6 +137,8 @@ public:
     // Short rationale for estimate:
     Coord get_station_coordinates(StationID id);
 
+
+
     // We recommend you implement the operations below only after implementing the ones above
 
     // Estimate of performance:
@@ -184,7 +199,9 @@ public:
     // Short rationale for estimate:
     std::vector<RegionID> station_in_regions(StationID id);
 
-    // Non-compulsory operations
+
+
+    // EI-PAKOLLISET Non-compulsory operations
 
     // Estimate of performance:
     // Short rationale for estimate:
@@ -202,8 +219,25 @@ public:
     // Short rationale for estimate:
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
+
 private:
-    // Add stuff needed for your class implementation here
+
+    struct station_struct;  //turha?
+    using station_datastructure = unordered_map <string, station_struct>;   //turha?
+
+
+    struct station_struct{      //structiin ehkä lisäksi tietorakenne johon junalähdöt, tai osoitinhommia
+        StationID id;
+        Name name;
+        Coord coordinates;
+
+    };
+
+
+    unordered_map <string, station_struct> stations_umap_;
+
+
+
 
 };
 
