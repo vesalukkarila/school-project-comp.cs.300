@@ -235,7 +235,7 @@ private:
 
 
     unordered_map <string, station_struct> stations_umap_;
-
+    vector<StationID> station_vector_;
 
 
 

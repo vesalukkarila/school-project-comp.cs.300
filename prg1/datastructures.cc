@@ -29,7 +29,7 @@ Type random_in_range(Type start, Type end)
 // warning about unused parameters on operations you haven't yet implemented.)
 
 Datastructures::Datastructures():
-stations_umap_()
+stations_umap_(), station_vector_()
 
 {
 
@@ -57,27 +57,30 @@ unsigned int Datastructures::station_count()
 void Datastructures::clear_all()
 {
     stations_umap_.clear();
+    station_vector_.clear();
 }
 
 
 //Toimii
 //Ei mukana tehokkuuskisoissa, mielivaltainen järjestys.
+//EIKÖ TÄHÄN VOIS LAITTAA ATTRIBUUTTI VEKTORIN PALAUTUKSENA
 std::vector<StationID> Datastructures::all_stations()
 {
-    vector<StationID> station_vector;
+    return station_vector_;
+    /*vector<StationID> station_vector;
     for (auto& key : stations_umap_)
         station_vector.push_back(key.first);
-    return station_vector;
+    return station_vector;*/
 }
 
 
 //Toimii, tehokkuus epäselvä
-//Tehty miettimättä tiedostosta lukua
-// Ei salli &, en tiedä onko tarpeenkaan, pää menee sekaisin kohta semantiikasta
+
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     station_struct value = {id, name, xy};
-    bool insert_ok = stations_umap_.insert({id, value}).second; //second palauttaa booleanin jos onnistui, first palautti iteraattorin kohtaan joka esti tai missä onnistui
+    bool insert_ok = stations_umap_.insert({id, value}).second; //second palauttaa booleanin jos onnistui
+    station_vector_.push_back(id);  //attribuuttivektori jota alphabetically ja distance_increasing:ssä järjestellään
     if ( insert_ok )
         return true;
     return false;
@@ -113,35 +116,75 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 
 
-
-
 // We recommend you implement the operations below only after implementing the ones above
 
+
+//TOIMII GUISSA, TEHOKKUUDESTA EI VIELÄ TIETOA, attribuuttivektori käytössä
+
+//unordered_mapin Sorttauksessa mitään järkeä? Vektoriin pairit jossa sorttaus.second ja vielä yhteen vektoriin pelkät id:t?
+//vektoriin pelkkä stationid:t ja lambdan avulla järjestää unordered mapin tiedoilla
+//useampi tietorakenne map jota voi järjestää
+//tietorakenne jossa osoittimia unorderemappiin
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
-    // Replace the line below with your implementation
-    throw NotImplemented("stations_alphabetically()");
+   /* vector<StationID> re_vector;
+
+    auto push = [&re_vector](auto &v){ re_vector.push_back(v.first);};  //lamnda jolla..
+    for_each(stations_umap_.begin(), stations_umap_.end(), push);           //..työnnetään vektoriin stationid:t
+*/
+
+    auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
+    {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
+
+    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin avulla
+
+    return station_vector_;
 }
 
+//TOIMII GUISSA, TEHOKKUUDESTA EI VIELÄ TIETOA. attribuuttivektori käytössä
+//Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
-    // Replace the line below with your implementation
-    throw NotImplemented("stations_distance_increasing()");
+
+    auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
+    {return stations_umap_.at(a).coordinates < stations_umap_.at(b).coordinates;};
+
+    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin avulla
+
+    return station_vector_;
 }
 
-StationID Datastructures::find_station_with_coord(Coord /*xy*/)
+
+
+//Toimii, tehokkuudesta ei tietoa
+StationID Datastructures::find_station_with_coord(Coord xy)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("find_station_with_coord()");
+    auto search = [&xy] (auto& kv ) {return kv.second.coordinates == xy;};
+    auto iterator = find_if(stations_umap_.begin(), stations_umap_.end(), search);
+    if (iterator != stations_umap_.end())
+        return iterator->first;
+    return NO_STATION;
 }
 
-bool Datastructures::change_station_coord(StationID /*id*/, Coord /*newcoord*/)
+
+//Kannattaako yllä olevalla tavalla jatkaa?, tehty kuitenkin samoin ihan vain testiks. Kato paremmin
+bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("change_station_coord()");
+    auto search = [&id] (auto& kv ) {return kv.first == id;};
+    auto iterator = find_if(stations_umap_.begin(), stations_umap_.end(), search);
+    if (iterator != stations_umap_.end()) {
+        iterator->second.coordinates = newcoord;
+        return true;
+    }
+
+    return false;
 }
+
+
+
+
+
+
 
 
 
