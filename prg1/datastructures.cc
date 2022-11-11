@@ -43,7 +43,7 @@ Datastructures::~Datastructures()
 
 
 
-
+//Toimii
 unsigned int Datastructures::station_count()
 {    
     return stations_umap_.size();
@@ -60,9 +60,8 @@ void Datastructures::clear_all()
 }
 
 
-//Ok, pitäs olla
+//Toimii
 //Ei mukana tehokkuuskisoissa, mielivaltainen järjestys.
-//Pitääkö olla &station_umap_, tekeekö paikallisen kopion attribuutista ilman &-merkkiä????????
 std::vector<StationID> Datastructures::all_stations()
 {
     vector<StationID> station_vector;
@@ -72,7 +71,7 @@ std::vector<StationID> Datastructures::all_stations()
 }
 
 
-
+//Toimii, tehokkuus epäselvä
 //Tehty miettimättä tiedostosta lukua
 // Ei salli &, en tiedä onko tarpeenkaan, pää menee sekaisin kohta semantiikasta
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
@@ -82,30 +81,24 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
     if ( insert_ok )
         return true;
     return false;
-
-
-
 }
 
 
-
-
+//Toimii, tehokkuus epäselvä
 //KUTSUTAAN USEIN, OPTIMOINTIA VAATINEE. find, contains, count,
 //Sama minkä ottaa niin const ja & jottei kopioi
 //Tarviiko attribuutti_umap olla viite, voiko olla, kopioiko koko attribuutin kun käyttää algoritmia jos ei ole &?????
 Name Datastructures::get_station_name(StationID id)
 {
-    //find, laitettu vain viite etsittävän eteen
-    auto search = stations_umap_.find(id);
+    auto search = stations_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
     if (search != stations_umap_.end())
         return search->second.name;
     return NO_NAME;
-
-
 }
 
 
 
+//Toimii, tehokkuus epäselvä
 //USEIN
 //Jos korjattavaa niin korjaa ylläoleva myös, samat toiminnot
 Coord Datastructures::get_station_coordinates(StationID id)
@@ -115,8 +108,6 @@ Coord Datastructures::get_station_coordinates(StationID id)
         return search->second.coordinates;
     return NO_COORD;
 }
-
-
 
 
 
@@ -152,6 +143,9 @@ bool Datastructures::change_station_coord(StationID /*id*/, Coord /*newcoord*/)
     throw NotImplemented("change_station_coord()");
 }
 
+
+
+//JUNALÄHDÖT 3kpl
 bool Datastructures::add_departure(StationID /*stationid*/, TrainID /*trainid*/, Time /*time*/)
 {
     // Replace the line below with your implementation
@@ -174,6 +168,7 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 }
 
 
+//REGIONIT
 // We recommend you implement the operations below only after implementing the ones above
 
 bool Datastructures::add_region(RegionID /*id*/, const Name &/*name*/, std::vector<Coord> /*coords*/)
@@ -223,6 +218,8 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID /*id*/)
     // Also uncomment parameters ( /* param */ -> param )
     throw NotImplemented("station_in_regions()");
 }
+
+
 
 
 // EI-PAKOLLISET Non-compulsory operations

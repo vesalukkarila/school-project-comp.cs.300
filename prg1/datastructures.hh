@@ -113,27 +113,27 @@ public:
     Datastructures();
     ~Datastructures();
 
-    // Estimate of performance:
+    // Estimate of performance: O(n)
     // Short rationale for estimate:
     unsigned int station_count();
 
-    // Estimate of performance:
+    // Estimate of performance: O(n)
     // Short rationale for estimate:
     void clear_all();
 
-    // Estimate of performance:
+    // Estimate of performance: O(n)
     // Short rationale for estimate:
     std::vector<StationID> all_stations();
 
-    // Estimate of performance:
+    // Estimate of performance: O(n)
     // Short rationale for estimate:
     bool add_station(StationID id, Name const& name, Coord xy);
 
-    // Estimate of performance:
+    // Estimate of performance: O(n)
     // Short rationale for estimate:
     Name get_station_name(StationID id);
 
-    // Estimate of performance:
+    // Estimate of performance: O(n)
     // Short rationale for estimate:
     Coord get_station_coordinates(StationID id);
 
