@@ -288,7 +288,7 @@ bool Datastructures::add_station_to_region(StationID /*id*/, RegionID /*parentid
     */
 }
 
-//Palauttaa kaikki alueet joihin asema kuuluu, rekursiivinen apufunkku? triviaali:parent_ptr = nullptr, muutoin lisää regionid viitevektoriin
+//Palauttafa kaikki alueet joihin asema kuuluu, rekursiivinen apufunkku? triviaali:parent_ptr = nullptr, muutoin lisää regionid viitevektoriin
 std::vector<RegionID> Datastructures::station_in_regions(StationID /*id*/)
 {
     // Replace the line below with your implementation
