@@ -15,6 +15,7 @@
 #include <functional>
 #include <exception>
 #include <unordered_map>
+#include <set>
 
 using namespace std;
 // Types for IDs
@@ -230,6 +231,7 @@ private:
         StationID id;
         Name name;
         Coord coordinates;
+        set<pair<Time, TrainID>> trains_set;
 
     };
 

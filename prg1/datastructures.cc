@@ -28,6 +28,8 @@ Type random_in_range(Type start, Type end)
 // an operation (Commenting out parameter name prevents compiler from
 // warning about unused parameters on operations you haven't yet implemented.)
 
+
+
 Datastructures::Datastructures():
 stations_umap_(), station_vector_()
 
@@ -61,24 +63,18 @@ void Datastructures::clear_all()
 }
 
 
-//Toimii
+//Toimii GUIssa
 //Ei mukana tehokkuuskisoissa, mielivaltainen järjestys.
-//EIKÖ TÄHÄN VOIS LAITTAA ATTRIBUUTTI VEKTORIN PALAUTUKSENA
 std::vector<StationID> Datastructures::all_stations()
 {
     return station_vector_;
-    /*vector<StationID> station_vector;
-    for (auto& key : stations_umap_)
-        station_vector.push_back(key.first);
-    return station_vector;*/
+
 }
 
-
-//Toimii, tehokkuus epäselvä
-
+//Toimii GUIssa, tehokkuus epäselvä
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
-    station_struct value = {id, name, xy};
+    station_struct value = {id, name, xy, {}};      //lisätty trainset alustus {}
     bool insert_ok = stations_umap_.insert({id, value}).second; //second palauttaa booleanin jos onnistui
     station_vector_.push_back(id);  //attribuuttivektori jota alphabetically ja distance_increasing:ssä järjestellään
     if ( insert_ok )
@@ -121,18 +117,11 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 //TOIMII GUISSA, TEHOKKUUDESTA EI VIELÄ TIETOA, attribuuttivektori käytössä
 
-//unordered_mapin Sorttauksessa mitään järkeä? Vektoriin pairit jossa sorttaus.second ja vielä yhteen vektoriin pelkät id:t?
 //vektoriin pelkkä stationid:t ja lambdan avulla järjestää unordered mapin tiedoilla
 //useampi tietorakenne map jota voi järjestää
 //tietorakenne jossa osoittimia unorderemappiin
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
-   /* vector<StationID> re_vector;
-
-    auto push = [&re_vector](auto &v){ re_vector.push_back(v.first);};  //lamnda jolla..
-    for_each(stations_umap_.begin(), stations_umap_.end(), push);           //..työnnetään vektoriin stationid:t
-*/
-
     auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
     {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
 
@@ -141,11 +130,14 @@ std::vector<StationID> Datastructures::stations_alphabetically()
     return station_vector_;
 }
 
-//TOIMII GUISSA, TEHOKKUUDESTA EI VIELÄ TIETOA. attribuuttivektori käytössä
+
+
+
+//VIKAA GRADERISSA JA GUISSAKIN EI SORTTAA, KATO EUKLIDINEN JA OHJEISTUS!!!!!!!!!!!!
+//TEHOKKUUDESTA EI VIELÄ TIETOA. attribuuttivektori käytössä
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
-
     auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
     {return stations_umap_.at(a).coordinates < stations_umap_.at(b).coordinates;};
 
@@ -183,32 +175,55 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 
 
 
+//KYSYMYS: KUN ACCESSOIDAAN UMAPIN SISÄLLÄ OLEVAA SETTIÄ JA TEHDÄÄN OPERAATIOITA NIIN MITEN TEHOKKUUDET YNNÄTÄÄN???????????+
 
-
-
-
-
-//JUNALÄHDÖT 3kpl
-bool Datastructures::add_departure(StationID /*stationid*/, TrainID /*trainid*/, Time /*time*/)
+//JUNALÄHDÖT 3kpl, kaikki toimii GUIssa
+//(departures after joku hyvä algoritmi, puolitushaku tms ehkä, jos normiiterointi liian kallista)
+bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("add_departure()");
+
+
+    if (stations_umap_.count(stationid) == 1){                                      //jos avain olemassa
+        return stations_umap_.at(stationid).trains_set.insert({time, trainid}).second; //insert.second == true, setin vuoksi tulee false jos jo olemassa
+    }
+    return false;
 }
 
-bool Datastructures::remove_departure(StationID /*stationid*/, TrainID /*trainid*/, Time /*time*/)
+//Toimii GUIssa
+bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("remove_departure()");
+    if (stations_umap_.count(stationid) == 1                                          //jos asema olemassa ja
+            && stations_umap_.at(stationid).trains_set.count({time, trainid}) == 1){  //jos pair olemassa, tässä at koska [ ] lisää uuden umappiin jos ei olemassa ainakin joissain tapauksissa
+        stations_umap_.at(stationid).trains_set.erase({time, trainid});
+        return true;
+    }
+    return false;
 }
 
-std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID /*stationid*/, Time /*time*/)
+
+/*toimii GUIssa, kun setistä ei löydy myöhäsempää junaa, palauttaa "No such station (NO_TIME, NO_TRAIN returned)"
+Osaa lajitella aseman mukaan jos time yhtäsuuri*/
+std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("station_departures_after()");
+
+    vector<std::pair<Time, TrainID>> re_vector;
+
+    if (stations_umap_.count(stationid) != 1) {
+        re_vector.push_back({NO_TIME, NO_TRAIN});
+    }
+
+    else {
+    for (auto& [f,s]: stations_umap_.at(stationid).trains_set){
+        if (f >= time)
+            re_vector.push_back({f, s});
+    }
+    if (re_vector.size() == 0)
+        re_vector.push_back({NO_TIME, NO_TRAIN});
+    }
+    return re_vector;
 }
+
+
 
 
 //REGIONIT
