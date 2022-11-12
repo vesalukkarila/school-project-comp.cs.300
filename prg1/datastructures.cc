@@ -29,15 +29,15 @@ Type random_in_range(Type start, Type end)
 // warning about unused parameters on operations you haven't yet implemented.)
 
 
-
+//Rakentaja
 Datastructures::Datastructures():
-stations_umap_(), station_vector_()
+stations_umap_(), station_vector_(), regions_umap_(), region_vector_()
 
 {
 
 }
 
-
+//Purkaja, osoittimille purut if needed
 Datastructures::~Datastructures()
 {
     // Write any cleanup you need here
@@ -54,12 +54,14 @@ unsigned int Datastructures::station_count()
 
 
 
-//LISÄÄ TÄHÄN REGIONIN TYHJENNYS
+//Jos osoittimia tulee purkajan kutsu? ----------HUOM---------
 //Ei mukana tehokkuuskisoissa
 void Datastructures::clear_all()
 {
     stations_umap_.clear();
     station_vector_.clear();
+    regions_umap_.clear();
+    region_vector_.clear();
 }
 
 
@@ -74,19 +76,17 @@ std::vector<StationID> Datastructures::all_stations()
 //Toimii GUIssa, tehokkuus epäselvä
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
-    station_struct value = {id, name, xy, {}};      //lisätty trainset alustus {}
-    bool insert_ok = stations_umap_.insert({id, value}).second; //second palauttaa booleanin jos onnistui
-    station_vector_.push_back(id);  //attribuuttivektori jota alphabetically ja distance_increasing:ssä järjestellään
-    if ( insert_ok )
+    station_struct value = {id, name, xy, {}};          //lisätty trainset alustus {}
+    if ( stations_umap_.insert({id, value}).second ){   //jos true, kts kuva jos joku vialla
+        station_vector_.push_back(id);                  //attribuuttivektori jota alphabetically ja distance_increasing:ssä järjestellään
         return true;
+    }
     return false;
 }
 
 
 //Toimii, tehokkuus epäselvä
 //KUTSUTAAN USEIN, OPTIMOINTIA VAATINEE. find, contains, count,
-//Sama minkä ottaa niin const ja & jottei kopioi
-//Tarviiko attribuutti_umap olla viite, voiko olla, kopioiko koko attribuutin kun käyttää algoritmia jos ei ole &?????
 Name Datastructures::get_station_name(StationID id)
 {
     auto search = stations_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
@@ -111,10 +111,6 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 
 
-
-// We recommend you implement the operations below only after implementing the ones above
-
-
 //TOIMII GUISSA, TEHOKKUUDESTA EI VIELÄ TIETOA, attribuuttivektori käytössä
 
 //vektoriin pelkkä stationid:t ja lambdan avulla järjestää unordered mapin tiedoilla
@@ -133,7 +129,7 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 
 
-//VIKAA GRADERISSA JA GUISSAKIN EI SORTTAA, KATO EUKLIDINEN JA OHJEISTUS!!!!!!!!!!!!
+//VIKAA GRADERISSA JA GUISSAKIN EI SORTTAA, KATO EUKLIDINEN JA OHJEISTUS!!!!!!!!!!!! ----------------------------
 //TEHOKKUUDESTA EI VIELÄ TIETOA. attribuuttivektori käytössä
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 std::vector<StationID> Datastructures::stations_distance_increasing()
@@ -229,33 +225,51 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 //REGIONIT
 // We recommend you implement the operations below only after implementing the ones above
 
-bool Datastructures::add_region(RegionID /*id*/, const Name &/*name*/, std::vector<Coord> /*coords*/)
+bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("add_region()");
+    region_struct value = {id, name, coords};
+    if ( regions_umap_.insert({id, value}).second ){   //jos true
+        region_vector_.push_back(id);                  //vectori jossa pelkästään regionid
+                                                        //TÄHÄN jos lisää region id osoituksia varten toiseen tietorakenteeseen!!!!
+        return true;
+    }
+    return false;
 }
 
+//Toimii GUIssa
 std::vector<RegionID> Datastructures::all_regions()
 {
-    // Replace the line below with your implementation
-    throw NotImplemented("all_regions()");
+    return region_vector_;
 }
 
-Name Datastructures::get_region_name(RegionID /*id*/)
+
+//Toimii GUIssa
+Name Datastructures::get_region_name(RegionID id)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("get_region_name()");
+    auto search = regions_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
+    if (search != regions_umap_.end())
+        return search->second.name;
+    return NO_NAME;
 }
 
-std::vector<Coord> Datastructures::get_region_coords(RegionID /*id*/)
+
+//Ei omaa komentoa GUIssa, kts graderit
+std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("get_region_coords()");
+    auto search = regions_umap_.find(id);
+    if (search != regions_umap_.end())
+        return search->second.coordinates_vector;
+    vector<Coord> v = {NO_COORD};                   //pitää palauttaa vektori jonka ainoa alkio nocoord, ei voi siis olla aseman structista löytyvä
+    return v;
+
+
 }
 
+
+
+/*Nämä 3 vaatii puutietorakenteen, osoittimia ja regionille mahdollisesti ylimääräisen tietorakenteen jossa osoittimia 2-suuntaan*/
+
+//regionit stabiilissa tietorakenteessa jossa toisena pointteri yläalueeseen
 bool Datastructures::add_subregion_to_region(RegionID /*id*/, RegionID /*parentid*/)
 {
     // Replace the line below with your implementation
@@ -263,19 +277,28 @@ bool Datastructures::add_subregion_to_region(RegionID /*id*/, RegionID /*parenti
     throw NotImplemented("add_subregion_to_region()");
 }
 
+/*stationista osoitin regioniin joka jossain stabiilissa tietorakenteessa ja siellä osoittimia yläalueisiin*/
 bool Datastructures::add_station_to_region(StationID /*id*/, RegionID /*parentid*/)
 {
     // Replace the line below with your implementation
     // Also uncomment parameters ( /* param */ -> param )
     throw NotImplemented("add_station_to_region()");
+    /*
+
+    */
 }
 
+//Palauttaa kaikki alueet joihin asema kuuluu, rekursiivinen apufunkku? triviaali:parent_ptr = nullptr, muutoin lisää regionid viitevektoriin
 std::vector<RegionID> Datastructures::station_in_regions(StationID /*id*/)
 {
     // Replace the line below with your implementation
     // Also uncomment parameters ( /* param */ -> param )
     throw NotImplemented("station_in_regions()");
 }
+
+
+
+
 
 
 

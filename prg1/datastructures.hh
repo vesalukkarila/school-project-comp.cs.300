@@ -224,10 +224,12 @@ public:
 private:
 
     struct station_struct;  //turha?
-    using station_datastructure = unordered_map <string, station_struct>;   //turha?
+    using station_datastructure = unordered_map <string, station_struct>;
+    struct region_struct;
+    using region_datastructure = unordered_map <int, region_struct>;
 
 
-    struct station_struct{      //structiin ehkä lisäksi tietorakenne johon junalähdöt, tai osoitinhommia
+    struct station_struct{      //structiin ehkä lisäksi  osoitinhommia regionin lisätietorakenteeseen viittamaan
         StationID id;
         Name name;
         Coord coordinates;
@@ -235,11 +237,19 @@ private:
 
     };
 
+    struct region_struct{
+        RegionID id;                        //Huom! unsigned long long int
+        Name name;
+        vector<Coord> coordinates_vector;    //muu kuin vektori?????
+    };
 
-    unordered_map <string, station_struct> stations_umap_;
+    //Station liittyvät
+    station_datastructure stations_umap_;
     vector<StationID> station_vector_;
 
-
+    //Region liittyvät
+    region_datastructure regions_umap_;
+    vector<RegionID> region_vector_;
 
 };
 
