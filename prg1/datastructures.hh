@@ -224,14 +224,9 @@ public:
 
 private:
 
-    struct station_struct;  //turha?
-    using station_datastructure = unordered_map <StationID, station_struct>;
-    struct region_struct;
-    using region_datastructure = unordered_map <RegionID, region_struct>;
 
-
-    struct station_struct{      //structiin ehkä lisäksi  osoitinhommia regionin lisätietorakenteeseen viittamaan
-        StationID id;           //turha structissa??
+    struct station_struct{
+        StationID id;           //turha structissa?? Taitaa olla, siivoa myös add_station&add_region
         Name name;
         Coord coordinates;
         set<pair<Time, TrainID>> trains_set;
@@ -239,27 +234,28 @@ private:
     };
 
     struct region_struct{
-        RegionID id;                        //Huom! unsigned long long int, turha structissa??
+        RegionID id;                        //Huom! unsigned long long int, turha structissa?? Taitaa olla, siivoa myös add_station&add_region
         Name name;
         vector<Coord> coordinates_vector;
 
-        //3 vikaa, puutietorakenteeseen liittyvää, jos ei tee dynaamisesti tai osoittimilla vaan tällee kiinteästi niin parempi näin kuin vektori
+        //3 viimeiseen vapaaehtoiseen liittyvät
         unordered_set <RegionID> subregions;
         unordered_set <StationID> stations;
         RegionID parent;
     };
 
-    //Station liittyvät
-    station_datastructure stations_umap_;
-    vector<StationID> station_vector_;
+                                        //Station liittyvät
+     unordered_map <StationID, station_struct> stations_umap_;
+                            vector<StationID> station_vector_;
 
-    //Region liittyvät
-    region_datastructure regions_umap_;
-    vector<RegionID> region_vector_;
+                                        //Region liittyvät
+        unordered_map <RegionID, region_struct> regions_umap_;
+                              vector<RegionID> region_vector_;
 
-    //3 vikaan vapaaehtoiseen liittyvä
-    unordered_set <RegionID> all_subregions_;
-    unordered_set <StationID> all_stations_for_regions_;
+                            //3 vikaan vapaaehtoiseen liittyvä
+                     unordered_set <RegionID> all_subregions_;
+          unordered_set <StationID> all_stations_for_regions_;
+
 
     //rekursiivinen apufunkku joka kerää alueiden parentit vektoriin
     //viiteparametrina regionid ja viitevektori johon kerää parentit kunnes ei enää ole

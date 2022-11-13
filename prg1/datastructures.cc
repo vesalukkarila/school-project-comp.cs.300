@@ -138,7 +138,8 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
-    {return stations_umap_.at(a).coordinates < stations_umap_.at(b).coordinates;};
+    {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
+                < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);};
 
     sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin avulla
 
