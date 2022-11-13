@@ -259,7 +259,10 @@ private:
 
     //rekursiivinen apufunkku joka kerää alueiden parentit vektoriin
     //viiteparametrina regionid ja viitevektori johon kerää parentit kunnes ei enää ole
-    bool recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
+    void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
+
+    //Apufunkku allsubregions_to_regionille
+    void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
 };
 

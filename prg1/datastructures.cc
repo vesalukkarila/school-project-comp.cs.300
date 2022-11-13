@@ -114,11 +114,9 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 
 
-//TOIMII GUISSA, TEHOKKUUDESTA EI VIELÄ TIETOA, attribuuttivektori käytössä
-
-//vektoriin pelkkä stationid:t ja lambdan avulla järjestää unordered mapin tiedoilla
-//useampi tietorakenne map jota voi järjestää
-//tietorakenne jossa osoittimia unorderemappiin
+//TOIMII
+//Tehokkuus?
+//sama mekanismi kuin alla
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
@@ -132,8 +130,8 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 
 
-//VIKAA GRADERISSA JA GUISSAKIN EI SORTTAA, KATO EUKLIDINEN JA OHJEISTUS!!!!!!!!!!!! ----------------------------
-//TEHOKKUUDESTA EI VIELÄ TIETOA. attribuuttivektori käytössä
+//Toimii graderissa
+//Tehokkuus?
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
@@ -148,7 +146,8 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
 
 
-//Toimii, tehokkuudesta ei tietoa
+//Toimii
+//Tehokkuus
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
     auto search = [&xy] (auto& kv ) {return kv.second.coordinates == xy;};
@@ -159,7 +158,8 @@ StationID Datastructures::find_station_with_coord(Coord xy)
 }
 
 
-//Kannattaako yllä olevalla tavalla jatkaa?, tehty kuitenkin samoin ihan vain testiks. Kato paremmin
+//Toimii
+//Tehokkuus?
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
     auto search = [&id] (auto& kv ) {return kv.first == id;};
@@ -175,25 +175,25 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 
 
 
-//KYSYMYS: KUN ACCESSOIDAAN UMAPIN SISÄLLÄ OLEVAA SETTIÄ JA TEHDÄÄN OPERAATIOITA NIIN MITEN TEHOKKUUDET YNNÄTÄÄN???????????+
-
 //JUNALÄHDÖT 3kpl, kaikki toimii GUIssa
-//(departures after joku hyvä algoritmi, puolitushaku tms ehkä, jos normiiterointi liian kallista)
+//Toimii
+//Tehokkuus?
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
 
 
-    if (stations_umap_.count(stationid) == 1){                                      //jos avain olemassa
-        return stations_umap_.at(stationid).trains_set.insert({time, trainid}).second; //insert.second == true, setin vuoksi tulee false jos jo olemassa
+    if (stations_umap_.count(stationid) == 1){
+        return stations_umap_.at(stationid).trains_set.insert({time, trainid}).second;
     }
     return false;
 }
 
-//Toimii GUIssa
+//Toimii
+//Tehokkuus?
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
-    if (stations_umap_.count(stationid) == 1                                          //jos asema olemassa ja
-            && stations_umap_.at(stationid).trains_set.count({time, trainid}) == 1){  //jos pair olemassa, tässä at koska [ ] lisää uuden umappiin jos ei olemassa ainakin joissain tapauksissa
+    if (stations_umap_.count(stationid) == 1
+            && stations_umap_.at(stationid).trains_set.count({time, trainid}) == 1){
         stations_umap_.at(stationid).trains_set.erase({time, trainid});
         return true;
     }
@@ -201,7 +201,8 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
 }
 
 
-/*toimii GUIssa */
+//Toimii
+//Tehokkuus?
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
 
@@ -212,9 +213,9 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
     }
 
     else {
-    for (auto& [f,s]: stations_umap_.at(stationid).trains_set){
-        if (f >= time)
-            re_vector.push_back({f, s});
+    for (auto& [departure_time, train]: stations_umap_.at(stationid).trains_set){
+        if (departure_time >= time)
+            re_vector.push_back({departure_time, train});
     }
 
     }
@@ -225,8 +226,9 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 
 
 //REGIONIT
-// We recommend you implement the operations below only after implementing the ones above
 
+//Toimii
+//Tehokkuus?
 bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
     region_struct value = {id, name, coords, {}, {}, 0};    //alustetaan parent 0:ksi
@@ -238,14 +240,16 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
     return false;
 }
 
-//Toimii GUIssa
+//Toimii
+//Tehokkuus?
 std::vector<RegionID> Datastructures::all_regions()
 {
     return region_vector_;
 }
 
 
-//Toimii GUIssa
+//Toimii
+//Tehokkuus?
 Name Datastructures::get_region_name(RegionID id)
 {
     auto search = regions_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
@@ -271,10 +275,8 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 
 
 
+//3 VIIMEISTÄ VAPAAEHTOISTA
 
-/*Nämä 3 vaatii puutietorakenteen, osoittimia ja regionille mahdollisesti ylimääräisen tietorakenteen jossa osoittimia 2-suuntaan*/
-
-//regionit stabiilissa tietorakenteessa jossa toisena pointteri yläalueeseen
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
     if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == 0) //if jompikumpi ei löydy
@@ -287,21 +289,12 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
         }
 
     return false;
-
-
-
-
-    /* VANHAA VARUILTA TALLELLA, PAREMPI SYSTEEMI TUO YLLÄ OLEVA
-    //loopin voi kiertää jos attribuuttina unordered_set josa jo lapsiksi lisätyt regionid:t, tsekkaa onko siellä ja lisää sinne lapsen truevaihessa
-    for (auto& [key , value] : regions_umap_){                  //tehokkaampaa tapaa loopata??????
-        if (value.children.count(id) == 1)                       //jos on jo alialueena
-            return false;
-    } */
 }
 
 
 
-//EI TOIMI
+//Toimii
+//Tehokkuus?
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
 
@@ -319,56 +312,73 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 
 
-
-
-//Palauttafa kaikki alueet joihin asema kuuluu, rekursiivinen apufunkku? triviaali:parent_ptr = nullptr, muutoin lisää regionid viitevektoriin
+//Toimii
+//Tehokkuus?
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
-    vector<RegionID> v;
-    if (all_stations_for_regions_.count(id) == 0)   //jos asema ei kuulu mihinkään alueeseen palautetaan tyhjä vektori
-        return v;
+    vector<RegionID> re_vector;
+    if (all_stations_for_regions_.count(id) == 0)
+        return re_vector;
 
-    if (stations_umap_.count(id) == 0 ) {//ohjeessa "jos id:llä ei asemaa, palautetaan vektori jonka alkiona no_region??????????
-        v.push_back(NO_REGION);
-        return v;
+    if (stations_umap_.count(id) == 0 ) {
+        re_vector.push_back(NO_REGION);
+        return re_vector;
     }
 
-                                //pitää löytää region johon asema kuuluu
-                                //lisätä regionid vektoriin
-                                //kutsua rekursiivista
     for (auto& [key, value] : regions_umap_){
 
         if (value.stations.count(id) == 1){
-            v.push_back(key);
-            recursive_parent_regions(key, v);
+            re_vector.push_back(key);
+            recursive_parent_regions(key, re_vector);
             break;
         }
     }
-    return v;
+    return re_vector;
 }
 
 
-//Paluuarvo nyt bool?????
-bool Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &v)
+
+//Apufunktio
+//Toimii
+//Tehokkuus ja miten ynnätään kutsuvan funkun kanssa yhteen?
+void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
     if (regions_umap_.at(id).parent == 0)   //parent alustettu 0:ksi addregionissa
-        return true;
-    v.push_back(regions_umap_.at(id).parent);   //Lisää parentin vektoriin, yllä tarkistettu sen olemassa olo
-    recursive_parent_regions(regions_umap_.at(id).parent, v);   //rekursiokutsu parentin id:llä
-    return true;
+        return;
+    re_vector.push_back(regions_umap_.at(id).parent);   //Lisää parentin vektoriin, yllä tarkistettu sen olemassa olo
+    recursive_parent_regions(regions_umap_.at(id).parent, re_vector);   //rekursiokutsu parentin id:llä
+    return;
 }
+
 
 
 
 
 // EI-PAKOLLISET Non-compulsory operations
 
-std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID /*id*/)
+
+//Pitäs onnistua, alialueet löytyy regions_umap.at(id).subregions (usetistä)
+//suoraan rekursio funkkuun? joku parempi tapa kuin loopata jokaista subregionsista löytyvää, kaikki ne on käytävä läpi, lineaarista hommaa kai??
+//NlogN veikkaan, rekursion vuoksi
+std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("all_subregions_of_region()");
+    vector<RegionID> re_vector;
+    recursive_subregions_to_regions(id, re_vector);
+    return re_vector;
 }
+
+//Apufunkku yllä olevalle
+void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<RegionID> &re_vector)
+{
+    if (regions_umap_.at(id).subregions.empty())
+        return;
+    for (auto& value : regions_umap_.at(id).subregions){
+        re_vector.push_back(value);
+        recursive_subregions_to_regions(value, re_vector);
+    }
+    return;
+}
+
 
 std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
 {
@@ -377,12 +387,29 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
     throw NotImplemented("stations_closest_to()");
 }
 
-bool Datastructures::remove_station(StationID /*id*/)
+
+//Kato mistä kaikista pitää poistaa
+bool Datastructures::remove_station(StationID id)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("remove_station()");
+    if (stations_umap_.count(id) == 0)
+        return false;
+    stations_umap_.erase(id);
+
+    //Jos löytyy tietorakenteesta johon on listattu kaikki alueille alistetut asemat..
+    if (all_stations_for_regions_.count(id) == 1){
+        //..poistetaan..
+        all_stations_for_regions_.erase(id);
+        //..jolloin löytyy myös jonkin region tietorakenteen hyötykuormasta.stations
+        for ( auto& [k,v] : regions_umap_){
+            if ( v.stations.count(id) == 1){
+                v.stations.erase(id);
+            }
+        }
+    }
+    return true;
 }
+
+
 
 RegionID Datastructures::common_parent_of_regions(RegionID /*id1*/, RegionID /*id2*/)
 {
