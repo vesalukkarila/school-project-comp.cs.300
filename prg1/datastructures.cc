@@ -31,7 +31,7 @@ Type random_in_range(Type start, Type end)
 
 //Rakentaja
 Datastructures::Datastructures():
-stations_umap_(), station_vector_(), regions_umap_(), region_vector_()
+stations_umap_(), station_vector_(), regions_umap_(), region_vector_(), all_subregions_(), all_stations_for_regions_()
 
 {
 
@@ -62,6 +62,9 @@ void Datastructures::clear_all()
     station_vector_.clear();
     regions_umap_.clear();
     region_vector_.clear();
+    all_subregions_.clear();
+    all_stations_for_regions_.clear();
+
 }
 
 
@@ -197,8 +200,7 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
 }
 
 
-/*toimii GUIssa, kun setistä ei löydy myöhäsempää junaa, palauttaa "No such station (NO_TIME, NO_TRAIN returned)"
-Osaa lajitella aseman mukaan jos time yhtäsuuri*/
+/*toimii GUIssa */
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
 
@@ -213,8 +215,7 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
         if (f >= time)
             re_vector.push_back({f, s});
     }
-    if (re_vector.size() == 0)
-        re_vector.push_back({NO_TIME, NO_TRAIN});
+
     }
     return re_vector;
 }
@@ -227,7 +228,7 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 
 bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
-    region_struct value = {id, name, coords};
+    region_struct value = {id, name, coords, {}, {}, 0};    //alustetaan parent 0:ksi
     if ( regions_umap_.insert({id, value}).second ){   //jos true
         region_vector_.push_back(id);                  //vectori jossa pelkästään regionid
                                                         //TÄHÄN jos lisää region id osoituksia varten toiseen tietorakenteeseen!!!!
@@ -267,38 +268,94 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 
 
 
+
+
+
 /*Nämä 3 vaatii puutietorakenteen, osoittimia ja regionille mahdollisesti ylimääräisen tietorakenteen jossa osoittimia 2-suuntaan*/
 
 //regionit stabiilissa tietorakenteessa jossa toisena pointteri yläalueeseen
-bool Datastructures::add_subregion_to_region(RegionID /*id*/, RegionID /*parentid*/)
+bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("add_subregion_to_region()");
+    if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == 0) //if jompikumpi ei löydy
+        return false;
+
+    if (all_subregions_.insert(id).second) {                    //jos ei ennestään alialueena, lisäys attribuuttiin tapahtuu jos true
+        regions_umap_.at(parentid).subregions.insert(id);       //lisätään parentin alialue-uusettiin
+        regions_umap_.at(id).parent = parentid;             //TÄSSÄ MAHDOLLISUUS virheeseen JOS TESTATAAN VOIKO LAITTAA MONTA PARENTTIA IFFILLÄ JOTENKIN KIERTO
+        return true;
+        }
+
+    return false;
+
+
+
+
+    /* VANHAA VARUILTA TALLELLA, PAREMPI SYSTEEMI TUO YLLÄ OLEVA
+    //loopin voi kiertää jos attribuuttina unordered_set josa jo lapsiksi lisätyt regionid:t, tsekkaa onko siellä ja lisää sinne lapsen truevaihessa
+    for (auto& [key , value] : regions_umap_){                  //tehokkaampaa tapaa loopata??????
+        if (value.children.count(id) == 1)                       //jos on jo alialueena
+            return false;
+    } */
 }
 
-/*stationista osoitin regioniin joka jossain stabiilissa tietorakenteessa ja siellä osoittimia yläalueisiin*/
-bool Datastructures::add_station_to_region(StationID /*id*/, RegionID /*parentid*/)
-{
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("add_station_to_region()");
-    /*
 
-    */
+
+//EI TOIMI
+bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
+{
+
+    if (regions_umap_.count(parentid) == 0 || stations_umap_.count(id) == 0)
+        return false;
+
+    if (all_stations_for_regions_.insert(id).second){ //ajatuksena: jos insertointi onnistuu attribuuttiin joka pitää kirjaa alistetuista asemista
+        regions_umap_.at(parentid).stations.insert(id); //lisätään asema regionsin asemiin
+        return true;
+    }
+    return false;                                       //jos löytyy jos lisätyistä asemista niin palauttaa false eikä lisää regionin asemiin
+
+
 }
+
+
+
+
 
 //Palauttafa kaikki alueet joihin asema kuuluu, rekursiivinen apufunkku? triviaali:parent_ptr = nullptr, muutoin lisää regionid viitevektoriin
-std::vector<RegionID> Datastructures::station_in_regions(StationID /*id*/)
+std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("station_in_regions()");
+    vector<RegionID> v;
+    if (all_stations_for_regions_.count(id) == 0)   //jos asema ei kuulu mihinkään alueeseen palautetaan tyhjä vektori
+        return v;
+
+    if (stations_umap_.count(id) == 0 ) {//ohjeessa "jos id:llä ei asemaa, palautetaan vektori jonka alkiona no_region??????????
+        v.push_back(NO_REGION);
+        return v;
+    }
+
+                                //pitää löytää region johon asema kuuluu
+                                //lisätä regionid vektoriin
+                                //kutsua rekursiivista
+    for (auto& [key, value] : regions_umap_){
+
+        if (value.stations.count(id) == 1){
+            v.push_back(key);
+            recursive_parent_regions(key, v);
+            break;
+        }
+    }
+    return v;
 }
 
 
-
-
+//Paluuarvo nyt bool?????
+bool Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &v)
+{
+    if (regions_umap_.at(id).parent == 0)   //parent alustettu 0:ksi addregionissa
+        return true;
+    v.push_back(regions_umap_.at(id).parent);   //Lisää parentin vektoriin, yllä tarkistettu sen olemassa olo
+    recursive_parent_regions(regions_umap_.at(id).parent, v);   //rekursiokutsu parentin id:llä
+    return true;
+}
 
 
 
@@ -332,3 +389,7 @@ RegionID Datastructures::common_parent_of_regions(RegionID /*id1*/, RegionID /*i
     // Also uncomment parameters ( /* param */ -> param )
     throw NotImplemented("common_parent_of_regions()");
 }
+
+
+
+
