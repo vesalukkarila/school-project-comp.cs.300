@@ -114,6 +114,9 @@ Coord Datastructures::get_station_coordinates(StationID id)
 //Tehokkuus:
 //"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"----------------------------------
 //sama mekanismi kuin alla, jos lagaa kumpikin lagaa
+
+//JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI-----
+
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
@@ -131,6 +134,8 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 //Tehokkuus?
 //"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"------------------------------------
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
+
+//JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
@@ -148,7 +153,7 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 //Tehokkuus:
 //"Your code appears to perform slower than the reference
 //implementation but still better than the minimum requirement of O(n log n). (6/10)"---------------------------------------
-//value? muita kuin for-looppi??
+//value? muita kuin for-looppi?? tai joku muu mikä käy ne läpi
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
     /*
@@ -157,27 +162,28 @@ StationID Datastructures::find_station_with_coord(Coord xy)
     if (iterator != stations_umap_.end())
         return iterator->first;
         */
+    /*eka parannusyritys, edelleen 6/10
     for (auto&[k,v]:stations_umap_){
         if(v.coordinates == xy)
             return k;
+    }
+    */
+
+    //toinen yritys iteroiden
+    for(auto it = stations_umap_.begin(); it != stations_umap_.end(); ++it){
+
+        if(it->second.coordinates == xy)
+            return it->first;
     }
     return NO_STATION;
 }
 
 
 //Toimii
-//Your code appears to have O(n log n) complexity which is the minimum required.(3/10)-----------------------------------
+//Tehokkuus 10/10
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
-    /*
-    auto search = [&id] (auto& kv ) {return kv.first == id;};
-    auto iterator = find_if(stations_umap_.begin(), stations_umap_.end(), search);
-    if (iterator != stations_umap_.end()) {
-        iterator->second.coordinates = newcoord;
-        return true;
-    }
-    */
-    /*uusi ehdotus*/
+
     if (auto it = stations_umap_.find(id); it != stations_umap_.end()){
         it->second.coordinates = newcoord;
         return true;
