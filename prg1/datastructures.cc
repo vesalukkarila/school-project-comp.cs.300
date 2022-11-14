@@ -23,11 +23,6 @@ Type random_in_range(Type start, Type end)
     return static_cast<Type>(start+num);
 }
 
-// Modify the code below to implement the functionality of the class.
-// Also remove comments from the parameter names when you implement
-// an operation (Commenting out parameter name prevents compiler from
-// warning about unused parameters on operations you haven't yet implemented.)
-
 
 //Rakentaja
 Datastructures::Datastructures():
@@ -79,9 +74,9 @@ std::vector<StationID> Datastructures::all_stations()
 //Toimii GUIssa, tehokkuus epäselvä
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
-    station_struct value = {id, name, xy, {}};          //lisätty trainset alustus {}
-    if ( stations_umap_.insert({id, value}).second ){   //jos true, kts kuva jos joku vialla
-        station_vector_.push_back(id);                  //attribuuttivektori jota alphabetically ja distance_increasing:ssä järjestellään
+    station_struct value = {id, name, xy, {}};
+    if ( stations_umap_.insert({id, value}).second ){
+        station_vector_.push_back(id);
         return true;
     }
     return false;
@@ -92,7 +87,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 //KUTSUTAAN USEIN, OPTIMOINTIA VAATINEE. find, contains, count,
 Name Datastructures::get_station_name(StationID id)
 {
-    auto search = stations_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
+    auto search = stations_umap_.find(id);
     if (search != stations_umap_.end())
         return search->second.name;
     return NO_NAME;
@@ -240,6 +235,7 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
     return false;
 }
 
+
 //Toimii
 //Tehokkuus?
 std::vector<RegionID> Datastructures::all_regions()
@@ -259,13 +255,14 @@ Name Datastructures::get_region_name(RegionID id)
 }
 
 
+
 //Ei omaa komentoa GUIssa, kts graderit
 std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 {
     auto search = regions_umap_.find(id);
     if (search != regions_umap_.end())
         return search->second.coordinates_vector;
-    vector<Coord> v = {NO_COORD};                   //pitää palauttaa vektori jonka ainoa alkio nocoord, ei voi siis olla aseman structista löytyvä
+    vector<Coord> v = {NO_COORD};
     return v;
 
 
@@ -273,18 +270,14 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 
 
 
-
-
-//3 VIIMEISTÄ VAPAAEHTOISTA
-
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
-    if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == 0) //if jompikumpi ei löydy
+    if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == 0)
         return false;
 
-    if (all_subregions_.insert(id).second) {                    //jos ei ennestään alialueena, lisäys attribuuttiin tapahtuu jos true
-        regions_umap_.at(parentid).subregions.insert(id);       //lisätään parentin alialue-uusettiin
-        regions_umap_.at(id).parent = parentid;             //TÄSSÄ MAHDOLLISUUS virheeseen JOS TESTATAAN VOIKO LAITTAA MONTA PARENTTIA IFFILLÄ JOTENKIN KIERTO
+    if (all_subregions_.insert(id).second) {
+        regions_umap_.at(parentid).subregions.insert(id);
+        regions_umap_.at(id).parent = parentid;
         return true;
         }
 
@@ -301,11 +294,11 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
     if (regions_umap_.count(parentid) == 0 || stations_umap_.count(id) == 0)
         return false;
 
-    if (all_stations_for_regions_.insert(id).second){ //ajatuksena: jos insertointi onnistuu attribuuttiin joka pitää kirjaa alistetuista asemista
-        regions_umap_.at(parentid).stations.insert(id); //lisätään asema regionsin asemiin
+    if (all_stations_for_regions_.insert(id).second){
+        regions_umap_.at(parentid).stations.insert(id);
         return true;
     }
-    return false;                                       //jos löytyy jos lisätyistä asemista niin palauttaa false eikä lisää regionin asemiin
+    return false;
 
 
 }
@@ -337,8 +330,7 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 }
 
 
-
-//Apufunktio
+//Apufunktio ylläolevalle
 //Toimii
 //Tehokkuus ja miten ynnätään kutsuvan funkun kanssa yhteen?
 void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &re_vector)
@@ -354,8 +346,7 @@ void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionI
 
 
 
-// EI-PAKOLLISET Non-compulsory operations
-
+// NON-COMPULSORY
 
 //Pitäs onnistua, alialueet löytyy regions_umap.at(id).subregions (usetistä)
 //suoraan rekursio funkkuun? joku parempi tapa kuin loopata jokaista subregionsista löytyvää, kaikki ne on käytävä läpi, lineaarista hommaa kai??
