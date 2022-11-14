@@ -169,12 +169,20 @@ StationID Datastructures::find_station_with_coord(Coord xy)
 //Your code appears to have O(n log n) complexity which is the minimum required.(3/10)-----------------------------------
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
+    /*
     auto search = [&id] (auto& kv ) {return kv.first == id;};
     auto iterator = find_if(stations_umap_.begin(), stations_umap_.end(), search);
     if (iterator != stations_umap_.end()) {
         iterator->second.coordinates = newcoord;
         return true;
     }
+    */
+    /*uusi ehdotus*/
+    if (auto it = stations_umap_.find(id); it != stations_umap_.end()){
+        it->second.coordinates = newcoord;
+        return true;
+    }
+
 
     return false;
 }
