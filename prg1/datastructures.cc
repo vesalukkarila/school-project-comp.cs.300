@@ -120,9 +120,9 @@ Coord Datastructures::get_station_coordinates(StationID id)
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
-    {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
+    {return stations_umap_.at(a).name <= stations_umap_.at(b).name;};
 
-    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin avulla
+    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin nimien avulla
 
     return station_vector_;
 }
@@ -136,13 +136,14 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
+//lisätty <= aiemmmin <
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
     {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
-                < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);};
+                <= sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);}; //
 
-    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin avulla
+    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin koord. avulla
 
     return station_vector_;
 }
@@ -336,7 +337,7 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 //Toimii
 //Tehokkuus:
-//"Your code performs worse than O(n log n). No points. (0/10)" ------------------------------------------------
+//"Your code performs worse than O(n log n). No points. (0/10)" ---------------------------------------------------------------------
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     vector<RegionID> re_vector;
