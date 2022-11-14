@@ -49,7 +49,7 @@ unsigned int Datastructures::station_count()
 
 
 
-//Jos osoittimia tulee purkajan kutsu? ----------HUOM---------
+// ----------HUOM---------
 //Ei mukana tehokkuuskisoissa
 void Datastructures::clear_all()
 {
@@ -64,7 +64,7 @@ void Datastructures::clear_all()
 
 
 //Toimii GUIssa
-//Ei mukana tehokkuuskisoissa, mielivaltainen järjestys.
+//"Excellent! Your code appears to perform better than the reference implementation. Well done. (10/10)"
 std::vector<StationID> Datastructures::all_stations()
 {
     return station_vector_;
@@ -83,7 +83,8 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 }
 
 
-//Toimii, tehokkuus epäselvä
+//Toimii
+//Tehokkuus: "The performance of your code is close to the reference implementation. Well done. (10/10)"
 //KUTSUTAAN USEIN, OPTIMOINTIA VAATINEE. find, contains, count,
 Name Datastructures::get_station_name(StationID id)
 {
@@ -110,8 +111,9 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 
 //TOIMII
-//Tehokkuus?
-//sama mekanismi kuin alla
+//Tehokkuus:
+//"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"----------------------------------
+//sama mekanismi kuin alla, jos lagaa kumpikin lagaa
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
@@ -127,6 +129,7 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 //Toimii graderissa
 //Tehokkuus?
+//"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"------------------------------------
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
@@ -142,19 +145,28 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
 
 //Toimii
-//Tehokkuus
+//Tehokkuus:
+//"Your code appears to perform slower than the reference
+//implementation but still better than the minimum requirement of O(n log n). (6/10)"---------------------------------------
+//value? muita kuin for-looppi??
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
+    /*
     auto search = [&xy] (auto& kv ) {return kv.second.coordinates == xy;};
     auto iterator = find_if(stations_umap_.begin(), stations_umap_.end(), search);
     if (iterator != stations_umap_.end())
         return iterator->first;
+        */
+    for (auto&[k,v]:stations_umap_){
+        if(v.coordinates == xy)
+            return k;
+    }
     return NO_STATION;
 }
 
 
 //Toimii
-//Tehokkuus?
+//Your code appears to have O(n log n) complexity which is the minimum required.(3/10)-----------------------------------
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
     auto search = [&id] (auto& kv ) {return kv.first == id;};
@@ -172,7 +184,7 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 
 //JUNALÄHDÖT 3kpl, kaikki toimii GUIssa
 //Toimii
-//Tehokkuus?
+//Tehokkuus? "The performance of your code is close to the reference implementation. Well done. (10/10)"
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
 
@@ -183,8 +195,10 @@ bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time ti
     return false;
 }
 
+
 //Toimii
-//Tehokkuus?
+//Tehokkuus:
+//"The performance of your code is close to the reference implementation. Well done. (10/10)"
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
     if (stations_umap_.count(stationid) == 1
@@ -197,7 +211,8 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
 
 
 //Toimii
-//Tehokkuus?
+//Tehokkuus:
+//"The performance of your code is close to the reference implementation. Well done. (10/10)"
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
 
@@ -245,7 +260,7 @@ std::vector<RegionID> Datastructures::all_regions()
 
 
 //Toimii
-//Tehokkuus?
+//Tehokkuus: "The performance of your code is close to the reference implementation. Well done. (10/10)"
 Name Datastructures::get_region_name(RegionID id)
 {
     auto search = regions_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
@@ -269,7 +284,7 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 }
 
 
-
+//Toimii
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
     if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == 0)
@@ -306,7 +321,8 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 
 //Toimii
-//Tehokkuus?
+//Tehokkuus:
+//"Your code performs worse than O(n log n). No points. (0/10)" ------------------------------------------------
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     vector<RegionID> re_vector;
