@@ -120,7 +120,7 @@ Coord Datastructures::get_station_coordinates(StationID id)
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
-    {return stations_umap_.at(a).name <= stations_umap_.at(b).name;};
+    {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
 
     sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin nimien avulla
 
@@ -136,12 +136,12 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
-//lisätty <= aiemmmin <
+//ajatus: if lause returniin, euklidinen miniehto(?), tsekkaa kriteerit etäisyysehdoista
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
     {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
-                <= sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);}; //
+                < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);}; //
 
     sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin koord. avulla
 
@@ -170,7 +170,7 @@ StationID Datastructures::find_station_with_coord(Coord xy)
     }
     */
 
-    //toinen yritys iteroiden
+    //toinen yritys iteroiden, vieläkin 6/10, looppi/iteraatiooptimointi!?!?!, for_each, videoneuvot, harjoitustehtävät
     for(auto it = stations_umap_.begin(); it != stations_umap_.end(); ++it){
 
         if(it->second.coordinates == xy)
