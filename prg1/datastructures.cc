@@ -149,6 +149,7 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 //JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
+    /*
     //auto sort_by_coord = [](){}
     auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
     {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
@@ -157,6 +158,14 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
     sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin koord. avulla
 
     return station_vector_;
+    */
+    //uutta coordaskeymap hyödyntäen
+    vector<StationID> re_vector;
+    re_vector.reserve(coord_as_key_map_.size());
+    for (auto& key : coord_as_key_map_){
+        re_vector.push_back(key.second);
+    }
+    return re_vector;
 }
 
 
