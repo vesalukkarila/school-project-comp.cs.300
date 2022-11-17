@@ -248,6 +248,7 @@ private:
      unordered_map <StationID, station_struct> stations_umap_;
                             vector<StationID> station_vector_;  //palautuksia varten
             map<Coord, StationID> coord_as_key_map_;  //findstationwithcoord varten, huomioi addstation ok, changecoord okja removeall ok
+                                 bool station_vector_sorted_;   //stations_alphabeticallya varten
 
                                         //Region liittyvät
         unordered_map <RegionID, region_struct> regions_umap_;

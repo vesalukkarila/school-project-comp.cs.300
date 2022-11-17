@@ -26,7 +26,7 @@ Type random_in_range(Type start, Type end)
 
 //Rakentaja
 Datastructures::Datastructures():
-stations_umap_(), station_vector_(), coord_as_key_map_(),
+stations_umap_(), station_vector_(), coord_as_key_map_(), station_vector_sorted_(false),
 regions_umap_(), region_vector_(),
 all_subregions_(), all_stations_for_regions_()
 
@@ -84,6 +84,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
     if ( stations_umap_.insert({id, value}).second ){   //lisäys umappiin
         station_vector_.push_back(id);                  //lisäys vektoriin
         coord_as_key_map_.insert({xy, id});             //apuattribuutti jossa coord avaimena, ajatus käyttää, findstationwithcoordia varten
+        station_vector_sorted_ = false;                 //stations_alphabetically varten
         return true;
     }
     return false;
@@ -116,25 +117,33 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 
 
-//"Perftest Timeout during performance tests for stations_distance_increasing. Your code needs optimization.--------"
 
+// NYT PIDETÄÄN KIRJAA EIKÄ JÄRJESTETÄ TARPEETTOMASTI, KATO HUOMENNA MITÄ TESTIT SANOO.
+//"Perftest Timeout during performance tests for stations_distance_increasing. Your code needs optimization.--------"
+//
 //Iiro: järjestetäänkö vektoria tarpeettomasti-----???
+//voi pitää kirjaa siitä onko station_vectoria sotkettu välissä eli tarviiko edes sortata lambdan avulla
+//eli mitkä funktiot voi muuttaa stationvectoria kutsujen välissä: add_station, clear_all
+//voi myös kiertää ja tehdä kuten stations_distance_increasing
 
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
-    auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
-    {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
+    if (station_vector_sorted_ == false){
+        auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
+        {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
 
-    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin nimien avulla
+        sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin nimien avulla
+        station_vector_sorted_ = true;
+    }
 
     return station_vector_;
 }
 
 
-
+//GRADERIA MUUTETTANEEN, KATO HUOMENNA MIKÄ MENO.
 //Complexity grader: "The actual complexity of stations_distance_increasing appears to be better than the estimated complexity. "
 //Merkattu summassa O(n log n) headerissa, mutta ei silti läpi perftestissä????????
-//Perftest"TIMEOUT", mutta voi johtua graderista
+//Perftest"TIMEOUT", mutta voi johtua graderista, tekee sen viime metreillä
 
 //JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timeout
 std::vector<StationID> Datastructures::stations_distance_increasing()
@@ -361,15 +370,10 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 }
 
-/*station structiin lisäkenttä <regionid>parentregion DONE,
- * tämän huomiointi kun add_station parametrina DONE,
- * add_station_to_region parentregionille parentid DONE
- * station_in_region for loopin muutto. rekursiivista voinee käyttää sellaisenaan*/
+
 
 //Toimii
-//Tehokkuus: Veikkaan log n, koska rekursio
-//"Your code appears to perform slower than... (6/10))" ---------------------------------------------------------------------
-// Miten tätä voi nopeuttaa, rekursiivisessa jotain vikaa?
+//The performance of your code is close to the reference implementation. Well done. (10/10)
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     vector<RegionID> re_vector;
@@ -389,8 +393,7 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 
 
 //Apufunktio ylläolevalle
-//Toimii
-//
+//The performance of your code is close to the reference implementation. Well done. (10/10)
 void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
     if (regions_umap_.at(id).parent == NO_REGION)   //parent alustettu no_regioniksi add_regionissa
@@ -440,7 +443,7 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
 }
 
 
-//Kato mistä kaikista pitää poistaa
+//Kato mistä kaikista pitää poistaa, jos toteutat muuta attribuutti joka pitää kirjaa onko station_vectoria muutettu
 bool Datastructures::remove_station(StationID id)
 {
     if (stations_umap_.count(id) == 0)
