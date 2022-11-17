@@ -631,6 +631,7 @@ MainProgram::CmdResult MainProgram::cmd_next_stations_from(std::ostream& /*outpu
     assert( begin == end && "Impossible number of parameters!");
 
     auto opresult = ds_.next_stations_from(id);
+    std::sort(opresult.begin(), opresult.end());
 
     CmdResultTrains result;
     result.reserve(opresult.size());

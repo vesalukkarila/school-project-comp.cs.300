@@ -32,8 +32,8 @@ No stations!
 > 
 ** End of commands from 'example-trains.txt'
 > next_stations_from tpe
-1. tampere (tpe) -> rovaniemi (roi)
-2. tampere (tpe) -> kuopio (kuo)
+1. tampere (tpe) -> kuopio (kuo)
+2. tampere (tpe) -> rovaniemi (roi)
 > train_stations_from tpe upwards
 1. tampere (tpe) -> rovaniemi (roi)
 2. rovaniemi (roi) -> kolari (kli)
