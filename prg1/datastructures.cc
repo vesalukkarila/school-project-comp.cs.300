@@ -145,7 +145,7 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 //Merkattu summassa O(n log n) headerissa, mutta ei silti läpi perftestissä????????
 //Perftest"TIMEOUT", mutta voi johtua graderista, tekee sen viime metreillä
 
-//JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timeout
+//JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timeout fd
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     /*
