@@ -119,7 +119,6 @@ Coord Datastructures::get_station_coordinates(StationID id)
 //Tehokkuus:
 //"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"----------------------------------
 //"Perftest Timeout during performance tests for stations_distance_increasing. Your code needs optimization.--------"
-//sama mekanismi kuin alla, jos lagaa kumpikin lagaa
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI-----???
 
@@ -138,7 +137,6 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 //"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"------------------------------------
 //"Perftest: Timeout during performance tests for stations_distance_increasing. Your code needs optimization."
-//Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
 //JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timeout
@@ -157,8 +155,8 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
     //uutta coordaskeymap hyödyntäen, EDELLEEN TIMEOUT PERFTESTISSÄ??????????????????????????????---------------------------------
     vector<StationID> re_vector;
-    re_vector.reserve(coord_as_key_map_.size());
-    for (auto& key : coord_as_key_map_){
+    re_vector.reserve(coord_as_key_map_.size());        //turha?
+    for (auto& key : coord_as_key_map_){                //voiko looppia parantaa?
         re_vector.push_back(key.second);
     }
     return re_vector;

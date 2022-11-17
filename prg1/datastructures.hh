@@ -124,7 +124,7 @@ public:
     // Short rationale for estimate: clear() is linear in all containers
     void clear_all();
 
-    // Estimate of performance: O(1)
+    // Estimate of performance: O(n)
     // Short rationale for estimate: Only returns one datastructure
     std::vector<StationID> all_stations();
 
@@ -196,8 +196,8 @@ public:
     // Short rationale for estimate: unrdered_map.count&unordered_set.insert: Average case: O(1), worst case O(size())
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance: O(log n)
-    // Short rationale for estimate: Uses recursive function which is log n
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: Uses recursive function which is n log n
     std::vector<RegionID> station_in_regions(StationID id);
 
 
