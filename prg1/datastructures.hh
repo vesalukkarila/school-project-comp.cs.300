@@ -17,6 +17,7 @@
 #include <unordered_map>
 #include <set>
 #include <unordered_set>
+#include <map>
 
 using namespace std;
 // Types for IDs
@@ -247,7 +248,7 @@ private:
                                         //Station liittyvät
      unordered_map <StationID, station_struct> stations_umap_;
                             vector<StationID> station_vector_;  //palautuksia varten
- unordered_map<Coord, StationID, CoordHash> coord_as_key_umap_;  //findstationwithcoord varten, huomioi addstation ok, changecoord okja removeall ok
+            map<Coord, StationID> coord_as_key_map_;  //findstationwithcoord varten, huomioi addstation ok, changecoord okja removeall ok
 
                                         //Region liittyvät
         unordered_map <RegionID, region_struct> regions_umap_;

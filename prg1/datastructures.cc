@@ -26,7 +26,7 @@ Type random_in_range(Type start, Type end)
 
 //Rakentaja
 Datastructures::Datastructures():
-stations_umap_(), station_vector_(), coord_as_key_umap_(),
+stations_umap_(), station_vector_(), coord_as_key_map_(),
 regions_umap_(), region_vector_(),
 all_subregions_(), all_stations_for_regions_()
 
@@ -57,7 +57,7 @@ void Datastructures::clear_all()
 {
     stations_umap_.clear();
     station_vector_.clear();
-    coord_as_key_umap_.clear();
+    coord_as_key_map_.clear();
 
     regions_umap_.clear();
     region_vector_.clear();
@@ -83,7 +83,7 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
     station_struct value = {id, name, xy, {}};
     if ( stations_umap_.insert({id, value}).second ){   //lisäys umappiin
         station_vector_.push_back(id);                  //lisäys vektoriin
-        coord_as_key_umap_.insert({xy, id});
+        coord_as_key_map_.insert({xy, id});
         return true;
     }
     return false;
@@ -146,8 +146,10 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
 //ajatus: if lause returniin, euklidinen miniehto(?), tsekkaa kriteerit etäisyysehdoista
+//JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
+    //auto sort_by_coord = [](){}
     auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
     {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
                 < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);}; //
@@ -161,10 +163,7 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
 //Toimii
 //Tehokkuus:
-//"Your code appears to perform slower than the reference
-//implementation but still better than the minimum requirement of O(n log n). (6/10)"---------------------------------------
-//value? muita kuin for-looppi?? tai joku muu mikä käy ne läpi
-//umap johon coord avaimeksi, huomioi change:station:coord
+//"Excellent! Your code appears to perform better than the reference implementation. Well done. (10/10)"
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
     /*
@@ -192,24 +191,24 @@ StationID Datastructures::find_station_with_coord(Coord xy)
     */
 
     //3 yritys, coordaskeyumap lisätty attribuutiksi
-    auto search = coord_as_key_umap_.find(xy);      //eli etsii coordaskeyumapista xy jos löytyy palauttaa hkuormana olevan stationid:n
-    if (search != coord_as_key_umap_.end())
+    auto search = coord_as_key_map_.find(xy);      //eli etsii coordaskeyumapista xy jos löytyy palauttaa hkuormana olevan stationid:n
+    if (search != coord_as_key_map_.end())
         return search->second;
     return NO_STATION;
 }
 
 
+
 //Toimii
 //Tehokkuus 10/10
-//Coordaskeyumapin operaatiot lisätty, tehokkuus nyt???????????
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
 
     if (auto it = stations_umap_.find(id); it != stations_umap_.end()){ //jos löytyy stumapista, löytyy myös coordumapista...
         Coord old_coordinate = it->second.coordinates;          //vanha koord talteen coordaskeyumapista poistoa varten
         it->second.coordinates = newcoord;      //päätietorakenne
-        coord_as_key_umap_.erase(old_coordinate);   //vanhan poisto
-        coord_as_key_umap_.insert({newcoord, id});  //.. ja coordaskeyumappiin muutos myös
+        coord_as_key_map_.erase(old_coordinate);   //vanhan poisto
+        coord_as_key_map_.insert({newcoord, id});  //.. ja coordaskeyumappiin muutos myös
 
         return true;
     }
