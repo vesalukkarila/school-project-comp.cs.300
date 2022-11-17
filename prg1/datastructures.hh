@@ -116,28 +116,28 @@ public:
     Datastructures();
     ~Datastructures();
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate:
+    // Estimate of performance: O(1)
+    // Short rationale for estimate: cppreference.com says so
     unsigned int station_count();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate:
+    // Short rationale for estimate: clear() is linear in all containers
     void clear_all();
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate:
+    // Estimate of performance: O(1)
+    // Short rationale for estimate: Only returns one datastructure
     std::vector<StationID> all_stations();
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate:
+    // Estimate of performance: O(log n)
+    // Short rationale for estimate: map.insert the most expensive one
     bool add_station(StationID id, Name const& name, Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate:
+    // Short rationale for estimate: worst case linear in the size of the container
     Name get_station_name(StationID id);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate:
+    // Estimate of performance: 0(n)
+    // Short rationale for estimate: worst case linear in the size of the container
     Coord get_station_coordinates(StationID id);
 
 
@@ -152,54 +152,54 @@ public:
     // Short rationale for estimate:
     std::vector<StationID> stations_distance_increasing();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(log n)
+    // Short rationale for estimate: map.find is logarithmic in the size of the container
     StationID find_station_with_coord(Coord xy);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unordered_map.find most expensive, worst case linear in the size of the container.
     bool change_station_coord(StationID id, Coord newcoord);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unordered_map.count most expensive, worst case linear in the size of the container.
     bool add_departure(StationID stationid, TrainID trainid, Time time);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unordered_map.count most expensive, others logarithmic.
     bool remove_departure(StationID stationid, TrainID trainid, Time time);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unordered_map and for-loop worst case linear->size of the container
     std::vector<std::pair<Time, TrainID>> station_departures_after(StationID stationid, Time time);
 
     // We recommend you implement the operations below only after implementing the ones above
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(1)
+    // Short rationale for estimate: 1-4) Average case: O(1), worst case O(size())?????
     bool add_region(RegionID id, Name const& name, std::vector<Coord> coords);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(1)
+    // Short rationale for estimate: only returns a vector
     std::vector<RegionID> all_regions();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate:unordered_map: Constant on average, worst case linear in the size of the container.
     Name get_region_name(RegionID id);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unordered_map: Constant on average, worst case linear in the size of the container.
     std::vector<Coord> get_region_coords(RegionID id);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: Average case: O(1), worst case O(size())
     bool add_subregion_to_region(RegionID id, RegionID parentid);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: Average case: O(1), worst case O(size())
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(log n)
+    // Short rationale for estimate: Uses recursive function
     std::vector<RegionID> station_in_regions(StationID id);
 
 

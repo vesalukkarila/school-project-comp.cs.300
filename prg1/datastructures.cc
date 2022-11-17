@@ -77,13 +77,13 @@ std::vector<StationID> Datastructures::all_stations()
 }
 
 
-//Toimii GUIssa, tehokkuus epäselvä
+//Toimii GUIssa
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     station_struct value = {id, name, xy, {}, NO_REGION};       //Alustettu region_id no_regioniksi
     if ( stations_umap_.insert({id, value}).second ){   //lisäys umappiin
         station_vector_.push_back(id);                  //lisäys vektoriin
-        coord_as_key_map_.insert({xy, id});
+        coord_as_key_map_.insert({xy, id});             //apuattribuutti jossa coord avaimena, ajatus käyttää, findstationwithcoordia varten
         return true;
     }
     return false;
@@ -92,7 +92,6 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 
 //Toimii
 //Tehokkuus: "The performance of your code is close to the reference implementation. Well done. (10/10)"
-//KUTSUTAAN USEIN, OPTIMOINTIA VAATINEE. find, contains, count,
 Name Datastructures::get_station_name(StationID id)
 {
     auto search = stations_umap_.find(id);
@@ -103,9 +102,8 @@ Name Datastructures::get_station_name(StationID id)
 
 
 
-//Toimii, tehokkuus epäselvä
-//USEIN
-//Jos korjattavaa niin korjaa ylläoleva myös, samat toiminnot
+//Toimii
+//worst case linear in the size of the container
 Coord Datastructures::get_station_coordinates(StationID id)
 {
     auto search = stations_umap_.find(id);
@@ -123,7 +121,7 @@ Coord Datastructures::get_station_coordinates(StationID id)
 //"Perftest Timeout during performance tests for stations_distance_increasing. Your code needs optimization.--------"
 //sama mekanismi kuin alla, jos lagaa kumpikin lagaa
 
-//JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI-----
+//JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI-----???
 
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
@@ -138,15 +136,12 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 
 
-//Toimii graderissa
-//Tehokkuus?
 //"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"------------------------------------
 //"Perftest: Timeout during performance tests for stations_distance_increasing. Your code needs optimization."
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
-//ajatus: if lause returniin, euklidinen miniehto(?), tsekkaa kriteerit etäisyysehdoista
-//JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timout
+//JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timeout
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
     /*
@@ -159,7 +154,8 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
     return station_vector_;
     */
-    //uutta coordaskeymap hyödyntäen, EDELLEEN TIMEOUT PERFTESTISSÄ??????????????????????????????
+
+    //uutta coordaskeymap hyödyntäen, EDELLEEN TIMEOUT PERFTESTISSÄ??????????????????????????????---------------------------------
     vector<StationID> re_vector;
     re_vector.reserve(coord_as_key_map_.size());
     for (auto& key : coord_as_key_map_){
@@ -210,6 +206,8 @@ StationID Datastructures::find_station_with_coord(Coord xy)
 
 //Toimii
 //Tehokkuus 10/10
+//umapfind Constant on average, worst case linear in the size of the container.
+//map.erase log n
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
 
@@ -230,8 +228,8 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 
 
 //JUNALÄHDÖT 3kpl, kaikki toimii GUIssa
-//Toimii
-//Tehokkuus? "The performance of your code is close to the reference implementation. Well done. (10/10)"
+//u_map.count Constant on average, worst case linear in the size of the container.
+//set.insert log n
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
 
@@ -244,8 +242,8 @@ bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time ti
 
 
 //Toimii
-//Tehokkuus:
-//"The performance of your code is close to the reference implementation. Well done. (10/10)"
+//umap.count  Constant on average, worst case linear in the size of the container.
+//others log n
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
     if (stations_umap_.count(stationid) == 1
@@ -258,7 +256,7 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
 
 
 //Toimii
-//Tehokkuus:
+//Tehokkuus: oisko O(n), count on ainakin, looppi myös, pushback constant
 //"The performance of your code is close to the reference implementation. Well done. (10/10)"
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
@@ -284,8 +282,7 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 
 //REGIONIT
 
-//Toimii
-//Tehokkuus?
+//umpain insert: 1-4) Average case: O(1), worst case O(size()), pushback constant, epävarma ?????????
 bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
     region_struct value = {id, name, coords, {}, {}, NO_REGION};    //alustetaan parentregion no_regioniksi
@@ -299,7 +296,7 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
 
 
 //Toimii
-//Tehokkuus?
+// O(1), only returns a vector
 std::vector<RegionID> Datastructures::all_regions()
 {
     return region_vector_;
@@ -307,7 +304,7 @@ std::vector<RegionID> Datastructures::all_regions()
 
 
 //Toimii
-//Tehokkuus: "The performance of your code is close to the reference implementation. Well done. (10/10)"
+//umap.find, Constant on average, worst case linear in the size of the container.
 Name Datastructures::get_region_name(RegionID id)
 {
     auto search = regions_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
@@ -318,7 +315,7 @@ Name Datastructures::get_region_name(RegionID id)
 
 
 
-//Ei omaa komentoa GUIssa, kts graderit
+//umap.find, Constant on average, worst case linear in the size of the container.
 std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 {
     auto search = regions_umap_.find(id);
@@ -332,6 +329,8 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 
 
 //Toimii
+//umap.count: Constant on average, worst case linear in the size of the container.
+//u_set.insert: 1-4) Average case: O(1), worst case O(size())
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
     if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == NO_REGION)
@@ -349,7 +348,8 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 
 
 //Toimii
-//Tehokkuus?
+//u_map.count Constant on average, worst case linear in the size of the container.
+//u_set.insert: 1-4) Average case: O(1), worst case O(size())
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
 
@@ -372,29 +372,20 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
  * station_in_region for loopin muutto. rekursiivista voinee käyttää sellaisenaan*/
 
 //Toimii
-//Tehokkuus:
-//"Your code performs worse than O(n log n). No points. (0/10)" ---------------------------------------------------------------------
-//parent stationstructiin
+//Tehokkuus: Veikkaan log n, koska rekursio
+//"Your code appears to perform slower than... (6/10))" ---------------------------------------------------------------------
+// Miten tätä voi nopeuttaa, rekursiivisessa jotain vikaa?
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     vector<RegionID> re_vector;
-    if (all_stations_for_regions_.count(id) == 0)   //jos ei löydy attribuutista johon lisätty kaikki regioneille alistetut asemat
-        return re_vector;                           //palautetaan tyhjä vektori
+    if (all_stations_for_regions_.count(id) == 0)   //jos ei löydy attribuutista johon lisätty kaikki regioneille alistetut asemat..
+        return re_vector;                           //..palautetaan tyhjä vektori
 
     if (stations_umap_.count(id) == 0 ) {           //jos id:llä ei ole asemaa palautetaan no_region
         re_vector.push_back(NO_REGION);
         return re_vector;
     }
-/* VANHA RATKAISU ennen stationstructin muuttamista
-    for (auto& [key, value] : regions_umap_){
 
-        if (value.stations.count(id) == 1){
-            re_vector.push_back(key);
-            recursive_parent_regions(key, re_vector);
-            break;
-        }
-    }
-    */
     re_vector.push_back(stations_umap_.at(id).parent_region);
     recursive_parent_regions(stations_umap_.at(id).parent_region, re_vector);   //haetaaan station umapista useasti sama tieto->muuttujaan?
 
@@ -404,7 +395,7 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 
 //Apufunktio ylläolevalle
 //Toimii
-//Tehokkuus ja miten ynnätään kutsuvan funkun kanssa yhteen?
+//
 void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
     if (regions_umap_.at(id).parent == NO_REGION)   //parent alustettu no_regioniksi add_regionissa
@@ -413,6 +404,9 @@ void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionI
     recursive_parent_regions(regions_umap_.at(id).parent, re_vector);   //rekursiokutsu parentin id:llä
     return;
 }
+
+
+
 
 
 
