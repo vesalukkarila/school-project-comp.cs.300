@@ -140,16 +140,14 @@ public:
     // Short rationale for estimate: worst case linear in the size of the container
     Coord get_station_coordinates(StationID id);
 
-
-
     // We recommend you implement the operations below only after implementing the ones above
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: Just for a show--------------------------
     std::vector<StationID> stations_alphabetically();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: Just for a show--------------------------
     std::vector<StationID> stations_distance_increasing();
 
     // Estimate of performance: O(log n)
