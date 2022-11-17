@@ -26,7 +26,9 @@ Type random_in_range(Type start, Type end)
 
 //Rakentaja
 Datastructures::Datastructures():
-stations_umap_(), station_vector_(), regions_umap_(), region_vector_(), all_subregions_(), all_stations_for_regions_()
+stations_umap_(), station_vector_(), coord_as_key_umap_(),
+regions_umap_(), region_vector_(),
+all_subregions_(), all_stations_for_regions_()
 
 {
 
@@ -55,8 +57,11 @@ void Datastructures::clear_all()
 {
     stations_umap_.clear();
     station_vector_.clear();
+    coord_as_key_umap_.clear();
+
     regions_umap_.clear();
     region_vector_.clear();
+
     all_subregions_.clear();
     all_stations_for_regions_.clear();
 
@@ -71,12 +76,14 @@ std::vector<StationID> Datastructures::all_stations()
 
 }
 
+
 //Toimii GUIssa, tehokkuus epäselvä
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     station_struct value = {id, name, xy, {}};
-    if ( stations_umap_.insert({id, value}).second ){
-        station_vector_.push_back(id);
+    if ( stations_umap_.insert({id, value}).second ){   //lisäys umappiin
+        station_vector_.push_back(id);                  //lisäys vektoriin
+        coord_as_key_umap_.insert({xy, id});
         return true;
     }
     return false;
@@ -113,6 +120,7 @@ Coord Datastructures::get_station_coordinates(StationID id)
 //TOIMII
 //Tehokkuus:
 //"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"----------------------------------
+//"Perftest Timeout during performance tests for stations_distance_increasing. Your code needs optimization.--------"
 //sama mekanismi kuin alla, jos lagaa kumpikin lagaa
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI-----
@@ -133,6 +141,7 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 //Toimii graderissa
 //Tehokkuus?
 //"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"------------------------------------
+//"Perftest: Timeout during performance tests for stations_distance_increasing. Your code needs optimization."
 //Tässä sama mekanismi kuin yllä, jos lagaa kumpikin lagaa
 
 //JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
@@ -155,6 +164,7 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 //"Your code appears to perform slower than the reference
 //implementation but still better than the minimum requirement of O(n log n). (6/10)"---------------------------------------
 //value? muita kuin for-looppi?? tai joku muu mikä käy ne läpi
+//umap johon coord avaimeksi, huomioi change:station:coord
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
     /*
@@ -163,6 +173,8 @@ StationID Datastructures::find_station_with_coord(Coord xy)
     if (iterator != stations_umap_.end())
         return iterator->first;
         */
+
+
     /*eka parannusyritys, edelleen 6/10
     for (auto&[k,v]:stations_umap_){
         if(v.coordinates == xy)
@@ -171,22 +183,34 @@ StationID Datastructures::find_station_with_coord(Coord xy)
     */
 
     //toinen yritys iteroiden, vieläkin 6/10, looppi/iteraatiooptimointi!?!?!, for_each, videoneuvot, harjoitustehtävät
-    for(auto it = stations_umap_.begin(); it != stations_umap_.end(); ++it){
+    /*
+     * for(auto it = stations_umap_.begin(); it != stations_umap_.end(); ++it){
 
         if(it->second.coordinates == xy)
             return it->first;
     }
+    */
+
+    //3 yritys, coordaskeyumap lisätty attribuutiksi
+    auto search = coord_as_key_umap_.find(xy);      //eli etsii coordaskeyumapista xy jos löytyy palauttaa hkuormana olevan stationid:n
+    if (search != coord_as_key_umap_.end())
+        return search->second;
     return NO_STATION;
 }
 
 
 //Toimii
 //Tehokkuus 10/10
+//Coordaskeyumapin operaatiot lisätty, tehokkuus nyt???????????
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
 
-    if (auto it = stations_umap_.find(id); it != stations_umap_.end()){
-        it->second.coordinates = newcoord;
+    if (auto it = stations_umap_.find(id); it != stations_umap_.end()){ //jos löytyy stumapista, löytyy myös coordumapista...
+        Coord old_coordinate = it->second.coordinates;          //vanha koord talteen coordaskeyumapista poistoa varten
+        it->second.coordinates = newcoord;      //päätietorakenne
+        coord_as_key_umap_.erase(old_coordinate);   //vanhan poisto
+        coord_as_key_umap_.insert({newcoord, id});  //.. ja coordaskeyumappiin muutos myös
+
         return true;
     }
 
@@ -338,6 +362,7 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 //Toimii
 //Tehokkuus:
 //"Your code performs worse than O(n log n). No points. (0/10)" ---------------------------------------------------------------------
+//parent stationstructiin
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     vector<RegionID> re_vector;
