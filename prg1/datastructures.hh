@@ -231,6 +231,7 @@ private:
         Name name;
         Coord coordinates;
         set<pair<Time, TrainID>> trains_set;
+        RegionID parent_region;
 
     };
 
