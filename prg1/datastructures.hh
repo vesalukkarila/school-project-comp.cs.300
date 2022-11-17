@@ -136,18 +136,18 @@ public:
     // Short rationale for estimate: worst case linear in the size of the container
     Name get_station_name(StationID id);
 
-    // Estimate of performance: 0(n)
+    // Estimate of performance: O(n)
     // Short rationale for estimate: worst case linear in the size of the container
     Coord get_station_coordinates(StationID id);
 
     // We recommend you implement the operations below only after implementing the ones above
 
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: Just for a show--------------------------
+    // Estimate of performance: O(n log n)---------------------MUUTA
+    // Short rationale for estimate: Just for a show------------------------------------------------MUUTA
     std::vector<StationID> stations_alphabetically();
 
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: Just for a show--------------------------
+    // Estimate of performance: O(n log n)---------------------MUUUTA
+    // Short rationale for estimate: Just for a show------------------------------------------MUUTA
     std::vector<StationID> stations_distance_increasing();
 
     // Estimate of performance: O(log n)
@@ -197,7 +197,7 @@ public:
     bool add_station_to_region(StationID id, RegionID parentid);
 
     // Estimate of performance: O(log n)
-    // Short rationale for estimate: Uses recursive function
+    // Short rationale for estimate: Uses recursive function which is log n
     std::vector<RegionID> station_in_regions(StationID id);
 
 
