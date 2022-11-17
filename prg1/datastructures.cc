@@ -115,12 +115,10 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 
 
-//TOIMII
-//Tehokkuus:
-//"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"----------------------------------
+
 //"Perftest Timeout during performance tests for stations_distance_increasing. Your code needs optimization.--------"
 
-//JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI-----???
+//Iiro: järjestetäänkö vektoria tarpeettomasti-----???
 
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
@@ -134,11 +132,10 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 
 
+//Complexity grader: "The actual complexity of stations_distance_increasing appears to be better than the estimated complexity. "
+//Merkattu summassa O(n log n) headerissa, mutta ei silti läpi perftestissä????????
+//Perftest"TIMEOUT", mutta voi johtua graderista
 
-//"Your code appears to have O(n log n) complexity which is the minimum required.  (3/10)"------------------------------------
-//"Perftest: Timeout during performance tests for stations_distance_increasing. Your code needs optimization."
-
-//JÄRJESTÄNKÖ VEKTORIA JOSKUS TARPEETTOMASTI--------
 //JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timeout
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {

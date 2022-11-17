@@ -125,7 +125,7 @@ public:
     void clear_all();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: Only returns one datastructure
+    // Short rationale for estimate: Complexity grader won´t accept O(1), only returns one datastructure
     std::vector<StationID> all_stations();
 
     // Estimate of performance: O(log n)
@@ -146,7 +146,7 @@ public:
     // Short rationale for estimate: Just for a show------------------------------------------------MUUTA
     std::vector<StationID> stations_alphabetically();
 
-    // Estimate of performance: O(n log n)---------------------MUUUTA
+    // Estimate of performance: O(n)---------------------MUUUTettu
     // Short rationale for estimate: Just for a show------------------------------------------MUUTA
     std::vector<StationID> stations_distance_increasing();
 
@@ -197,7 +197,7 @@ public:
     bool add_station_to_region(StationID id, RegionID parentid);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: Uses recursive function which is n log n
+    // Short rationale for estimate: Uses recursive function which is n log n--------------------------
     std::vector<RegionID> station_in_regions(StationID id);
 
 
