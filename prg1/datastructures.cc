@@ -1,8 +1,8 @@
 // Datastructures.cc
 //
-// Student name:
-// Student email:
-// Student number:
+// Student name: Vesa Lukkarila
+// Student email: vesa.lukkarila@tuni.fi
+// Student number: 150372523
 
 #include "datastructures.hh"
 
@@ -24,7 +24,9 @@ Type random_in_range(Type start, Type end)
 }
 
 
-//Rakentaja
+/**
+ * @brief Datastructures::Datastructures shows attributes
+ */
 Datastructures::Datastructures():
 stations_umap_(), station_vector_(), coord_as_key_map_(), station_vector_sorted_(false),
 regions_umap_(), region_vector_(),
@@ -34,15 +36,19 @@ all_subregions_(), all_stations_for_regions_()
 
 }
 
-//Purkaja, osoittimille purut if needed
+/**
+ * @brief Datastructures::~Datastructures no implemetation here
+ */
 Datastructures::~Datastructures()
 {
     // Write any cleanup you need here
 }
 
 
-
-//Toimii
+/**
+ * @brief Datastructures::station_count counts the number of stations
+ * @return number of stations
+ */
 unsigned int Datastructures::station_count()
 {    
     return stations_umap_.size();
@@ -50,9 +56,9 @@ unsigned int Datastructures::station_count()
 
 
 
-
-// ----------HUOM---------
-//Ei mukana tehokkuuskisoissa
+/**
+ * @brief Datastructures::clear_all clears all datastructures used
+ */
 void Datastructures::clear_all()
 {
     stations_umap_.clear();
@@ -68,31 +74,44 @@ void Datastructures::clear_all()
 }
 
 
-//Toimii GUIssa
-//"Excellent! Your code appears to perform better than the reference implementation. Well done. (10/10)"
+
+/**
+ * @brief Datastructures::all_stations this function´s work has been done in add station
+ * @return all station-id:s in a unsorted vector
+ */
 std::vector<StationID> Datastructures::all_stations()
 {
     return station_vector_;
-
 }
 
 
-//Toimii GUIssa
+//tekstiä sisällä -------------------------------------------------------------
+/**
+ * @brief Datastructures::add_station adds data about stations in necessary datastructures
+ * @param id, string, id of the station, unique for each station
+ * @param name, string, name of the station, not-unique
+ * @param xy, type Coord (see .hh file), station coordinates
+ * @return true if adding station to datastructure accomplished, otherwise false
+ */
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
-    station_struct value = {id, name, xy, {}, NO_REGION};       //Alustettu region_id no_regioniksi
-    if ( stations_umap_.insert({id, value}).second ){   //lisäys umappiin
-        station_vector_.push_back(id);                  //lisäys vektoriin
-        coord_as_key_map_.insert({xy, id});             //apuattribuutti jossa coord avaimena, ajatus käyttää, findstationwithcoordia varten
-        station_vector_sorted_ = false;                 //stations_alphabetically varten
+    station_struct value = {name, xy, {}, NO_REGION};
+    if ( stations_umap_.insert({id, value}).second ){           // päätietorakenne asemille
+        station_vector_.push_back(id);                          // tietorakenne palautuksia varten, kaikki asemat
+        coord_as_key_map_.insert({xy, id});                     // find_station_with_coordia varten
+        station_vector_sorted_ = false;                         // stations_alphabetically varten kirjanpito
         return true;
     }
     return false;
 }
 
 
-//Toimii
-//Tehokkuus: "The performance of your code is close to the reference implementation. Well done. (10/10)"
+
+/**
+ * @brief Datastructures::get_station_name searches for station by id and its name
+ * @param id, string, id of the station, unique id of the station
+ * @return string, stations name if station is found, otherwise NO_NAME(see .hh file)
+ */
 Name Datastructures::get_station_name(StationID id)
 {
     auto search = stations_umap_.find(id);
@@ -103,8 +122,11 @@ Name Datastructures::get_station_name(StationID id)
 
 
 
-//Toimii
-//worst case linear in the size of the container
+/**
+ * @brief Datastructures::get_station_coordinates searches for station by id and its coordinates
+ * @param id, string, id of the station, unique for each station
+ * @return Coord (see .hh file), coordinates for station if station is found, otherwise NO_COORD(see .hh file)
+ */
 Coord Datastructures::get_station_coordinates(StationID id)
 {
     auto search = stations_umap_.find(id);
@@ -115,24 +137,17 @@ Coord Datastructures::get_station_coordinates(StationID id)
 
 
 
-
-
-
-// NYT PIDETÄÄN KIRJAA EIKÄ JÄRJESTETÄ TARPEETTOMASTI, KATO HUOMENNA MITÄ TESTIT SANOO.
-//"Perftest Timeout during performance tests for stations_distance_increasing. Your code needs optimization.--------"
-//
-//Iiro: järjestetäänkö vektoria tarpeettomasti-----???
-//voi pitää kirjaa siitä onko station_vectoria sotkettu välissä eli tarviiko edes sortata lambdan avulla
-//eli mitkä funktiot voi muuttaa stationvectoria kutsujen välissä: add_station, clear_all
-//voi myös kiertää ja tehdä kuten stations_distance_increasing
-
+/**
+ * @brief Datastructures::stations_alphabetically sorts stations in alphabetical order by their names
+ * @return all station-id:s in a vector sorted by their names
+ */
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
     if (station_vector_sorted_ == false){
-        auto sort_vector = [this] (auto& a, auto& b )                       //lambda jolla...
+        auto sort_vector = [this] (auto& a, auto& b )
         {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
 
-        sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin nimien avulla
+        sort(station_vector_.begin(), station_vector_.end(), sort_vector);
         station_vector_sorted_ = true;
     }
 
@@ -140,29 +155,18 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 }
 
 
-//GRADERIA MUUTETTANEEN, KATO HUOMENNA MIKÄ MENO.
-//Complexity grader: "The actual complexity of stations_distance_increasing appears to be better than the estimated complexity. "
-//Merkattu summassa O(n log n) headerissa, mutta ei silti läpi perftestissä????????
-//Perftest"TIMEOUT", mutta voi johtua graderista, tekee sen viime metreillä
 
-//JOS KÄYTTÄÄ COORDASKAYUMAPPIA JÄRJESTÄMISEEN, edelleen timeout fd
+/**
+ * @brief Datastructures::stations_distance_increasing copies station-id:s from map to a vector,
+ * stations are allready in ascending order by their coordinates in a map
+ * @return all station-id:s in a vector sorted in ascending order byt coordinates
+ */
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
-    /*
-    //auto sort_by_coord = [](){}
-    auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
-    {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
-                < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);}; //
 
-    sort(station_vector_.begin(), station_vector_.end(), sort_vector);              //..sortataan vektorin stationid:t umapin koord. avulla
-
-    return station_vector_;
-    */
-
-    //uutta coordaskeymap hyödyntäen, EDELLEEN TIMEOUT PERFTESTISSÄ??????????????????????????????---------------------------------
     vector<StationID> re_vector;
-    re_vector.reserve(coord_as_key_map_.size());        //turha?
-    for (auto& key : coord_as_key_map_){                //voiko looppia parantaa?
+    re_vector.reserve(coord_as_key_map_.size());
+    for (auto& key : coord_as_key_map_){
         re_vector.push_back(key.second);
     }
     return re_vector;
@@ -170,37 +174,14 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
 
 
 
-//Toimii
-//Tehokkuus:
-//"Excellent! Your code appears to perform better than the reference implementation. Well done. (10/10)"
+/**
+ * @brief Datastructures::find_station_with_coord checks if station is found with given coordinates
+ * @param xy, Coord (see .hh file), coordinates of the searched station
+ * @return string, stations id if station found with coordinates, otherwise NO_STATION(see .hh file)
+ */
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
-    /*
-    auto search = [&xy] (auto& kv ) {return kv.second.coordinates == xy;};
-    auto iterator = find_if(stations_umap_.begin(), stations_umap_.end(), search);
-    if (iterator != stations_umap_.end())
-        return iterator->first;
-        */
-
-
-    /*eka parannusyritys, edelleen 6/10
-    for (auto&[k,v]:stations_umap_){
-        if(v.coordinates == xy)
-            return k;
-    }
-    */
-
-    //toinen yritys iteroiden, vieläkin 6/10, looppi/iteraatiooptimointi!?!?!, for_each, videoneuvot, harjoitustehtävät
-    /*
-     * for(auto it = stations_umap_.begin(); it != stations_umap_.end(); ++it){
-
-        if(it->second.coordinates == xy)
-            return it->first;
-    }
-    */
-
-    //3 yritys, coordaskeyumap lisätty attribuutiksi
-    auto search = coord_as_key_map_.find(xy);      //eli etsii coordaskeyumapista xy jos löytyy palauttaa hkuormana olevan stationid:n
+    auto search = coord_as_key_map_.find(xy);
     if (search != coord_as_key_map_.end())
         return search->second;
     return NO_STATION;
@@ -208,32 +189,36 @@ StationID Datastructures::find_station_with_coord(Coord xy)
 
 
 
-//Toimii
-//Tehokkuus 10/10
-//umapfind Constant on average, worst case linear in the size of the container.
-//map.erase log n
+/**
+ * @brief Datastructures::change_station_coord changes station coordinates in related datatstructures
+ * if station exists
+ * @param id, string, station we are looking for
+ * @param newcoord, new coordinates for the station
+ * @return true if station found otherwise false
+ */
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
 
-    if (auto it = stations_umap_.find(id); it != stations_umap_.end()){ //jos löytyy stumapista, löytyy myös coordumapista...
-        Coord old_coordinate = it->second.coordinates;          //vanha koord talteen coordaskeyumapista poistoa varten
-        it->second.coordinates = newcoord;      //päätietorakenne
-        coord_as_key_map_.erase(old_coordinate);   //vanhan poisto
-        coord_as_key_map_.insert({newcoord, id});  //.. ja coordaskeyumappiin muutos myös
+    if (auto it = stations_umap_.find(id); it != stations_umap_.end()){
+        Coord old_coordinate = it->second.coordinates;
+        it->second.coordinates = newcoord;
+        coord_as_key_map_.erase(old_coordinate);
+        coord_as_key_map_.insert({newcoord, id});
 
         return true;
     }
-
-
     return false;
 }
 
 
 
-
-//JUNALÄHDÖT 3kpl, kaikki toimii GUIssa
-//u_map.count Constant on average, worst case linear in the size of the container.
-//set.insert log n
+/**
+ * @brief Datastructures::add_departure adds train departure-info for given station
+ * @param stationid, string, unique for each station
+ * @param trainid, string (see .hh file), identification for the train
+ * @param time, unsigned short int (see .hh file), departure time of the train
+ * @return true if station exists otherwise false
+ */
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
 
@@ -245,9 +230,14 @@ bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time ti
 }
 
 
-//Toimii
-//umap.count  Constant on average, worst case linear in the size of the container.
-//others log n
+
+/**
+ * @brief Datastructures::remove_departure removes train departure-info if such found
+ * @param stationid, string (see .hh file), unique for each station
+ * @param trainid, string (see .hh file), identification for the train
+ * @param time, unsigned short int (see .hh file), departure time of the train
+ * @return true if given station and departure-info found otherwise false
+ */
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
     if (stations_umap_.count(stationid) == 1
@@ -259,39 +249,46 @@ bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time
 }
 
 
-//Toimii
-//Tehokkuus: oisko O(n), count on ainakin, looppi myös, pushback constant
-//"The performance of your code is close to the reference implementation. Well done. (10/10)"
+
+/**
+ * @brief Datastructures::station_departures_after lists all departures from given station at or after given time
+ * @param stationid, string (see .hh file), unique for each station
+ * @param time, unsigned short int (see .hh file), departure time of the train
+ * @return train-departure info in a vector as pairs, sorted by departure time
+ */
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
-
     vector<std::pair<Time, TrainID>> re_vector;
 
-    if (stations_umap_.count(stationid) != 1) {
-        re_vector.push_back({NO_TIME, NO_TRAIN});
-    }
+    if (stations_umap_.count(stationid) != 1)
+        re_vector.push_back({NO_TIME, NO_TRAIN});    
 
     else {
-    for (auto& [departure_time, train]: stations_umap_.at(stationid).trains_set){
-        if (departure_time >= time)
-            re_vector.push_back({departure_time, train});
-    }
+        for (auto& [departure_time, train]: stations_umap_.at(stationid).trains_set){
+            if (departure_time >= time)
+                re_vector.push_back({departure_time, train});
+        }
 
     }
+
     return re_vector;
 }
 
 
 
-
-//REGIONIT
-
-//umpain insert: 1-4) Average case: O(1), worst case O(size()), pushback constant, epävarma ?????????
+//sisällä kommentti, vapaaehtoisiin liittyen------------------------------------------
+/**
+ * @brief Datastructures::add_region adds a region to related datastructures if one doesn´t exist before
+ * @param id, integer (see .hh file), unique for each region
+ * @param name, string (see .hh file), name of the region
+ * @param coords, Coord (see .hh file), region´s coordinates in a vector
+ * @return true inserting accomplished otherwise false
+ */
 bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
-    region_struct value = {id, name, coords, {}, {}, NO_REGION};    //alustetaan parentregion no_regioniksi
-    if ( regions_umap_.insert({id, value}).second ){   //jos true
-        region_vector_.push_back(id);                  //vectori jossa pelkästään regionid
+    region_struct value = {name, coords, {}, {}, NO_REGION};
+    if ( regions_umap_.insert({id, value}).second ){
+        region_vector_.push_back(id);
                                                         //TÄHÄN jos lisää region id osoituksia varten toiseen tietorakenteeseen!!!!
         return true;
     }
@@ -299,19 +296,26 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
 }
 
 
-//Toimii
-// O(1), only returns a vector
+
+/**
+ * @brief Datastructures::all_regions work has been done in add_region
+ * @return unsorted vector full of regionid´s
+ */
 std::vector<RegionID> Datastructures::all_regions()
 {
     return region_vector_;
 }
 
 
-//Toimii
-//umap.find, Constant on average, worst case linear in the size of the container.
+
+/**
+ * @brief Datastructures::get_region_name checks if region exists returns its name
+ * @param id, integer (see .hh file), unique for each region
+ * @return regions name if region found by its id otherwise NO_NAME
+ */
 Name Datastructures::get_region_name(RegionID id)
 {
-    auto search = regions_umap_.find(id);  //suoraan if perään?, seuraavassa myös jos
+    auto search = regions_umap_.find(id);
     if (search != regions_umap_.end())
         return search->second.name;
     return NO_NAME;
@@ -319,7 +323,11 @@ Name Datastructures::get_region_name(RegionID id)
 
 
 
-//umap.find, Constant on average, worst case linear in the size of the container.
+/**
+ * @brief Datastructures::get_region_coords checks if regions exists and returns its coordinates
+ * @param id, integer (see .hh file), unique for each region
+ * @return regions coordinatesvector if region found otherwise NO_COORD in a vector
+ */
 std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 {
     auto search = regions_umap_.find(id);
@@ -327,14 +335,16 @@ std::vector<Coord> Datastructures::get_region_coords(RegionID id)
         return search->second.coordinates_vector;
     vector<Coord> v = {NO_COORD};
     return v;
-
-
 }
 
 
-//Toimii
-//umap.count: Constant on average, worst case linear in the size of the container.
-//u_set.insert: 1-4) Average case: O(1), worst case O(size())
+
+/**
+ * @brief Datastructures::add_subregion_to_region add info about parent-child relationship to related datastructures
+ * @param id, integer (see .hh file), unique for each region, subregion´s id
+ * @param parentid, integer (see .hh file), unique for each region, parentregion´s id
+ * @return true if both child and parent exist and if child has no parent allready, otherwise false
+ */
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
     if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == NO_REGION)
@@ -351,49 +361,61 @@ bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 
 
 
-//Toimii
-//u_map.count Constant on average, worst case linear in the size of the container.
-//u_set.insert: 1-4) Average case: O(1), worst case O(size())
+/**
+ * @brief Datastructures::add_station_to_region adds info about child-parent
+ *  relationship between station and region, station can belong to only 1 region
+ * @param id, stationid, string (see .hh file), unique for each station
+ * @param parentid, integer (see .hh file), unique for each region, parentregion´s id
+ * @return true if station and region exists and insertion accomplished, otherwise false
+ */
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
-
     if (regions_umap_.count(parentid) == 0 || stations_umap_.count(id) == 0)
         return false;
 
     if (all_stations_for_regions_.insert(id).second){
-        regions_umap_.at(parentid).stations.insert(id);     //asema sijoitetaan regionin "lapsiin"
-        stations_umap_.at(id).parent_region = parentid;     //stationumappiin aseman struct-hyötykuormassa region aseman "vanhemmaksi"
+        regions_umap_.at(parentid).stations.insert(id);
+        stations_umap_.at(id).parent_region = parentid;
         return true;
     }
     return false;
-
-
 }
 
 
 
-//Toimii
-//The performance of your code is close to the reference implementation. Well done. (10/10)
+/**
+ * @brief Datastructures::station_in_regions lists all regions given station belongs to
+ * either directly or indirectly. Calls recursive_parent_regions()-function
+ * @param id, stationid, string (see .hh file), unique for each station
+ * @return a vector inholding each region´s regionid given station belong to if station found,
+ * if given station is no submitted to any region returns empty vector
+ * if station doesn´t exist returns NO_REGION as single element in a vector
+ */
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     vector<RegionID> re_vector;
-    if (all_stations_for_regions_.count(id) == 0)   //jos ei löydy attribuutista johon lisätty kaikki regioneille alistetut asemat..
-        return re_vector;                           //..palautetaan tyhjä vektori
+    if (all_stations_for_regions_.count(id) == 0)
+        return re_vector;
 
-    if (stations_umap_.count(id) == 0 ) {           //jos id:llä ei ole asemaa palautetaan no_region
+    if (stations_umap_.count(id) == 0 ) {
         re_vector.push_back(NO_REGION);
         return re_vector;
     }
 
     re_vector.push_back(stations_umap_.at(id).parent_region);
-    recursive_parent_regions(stations_umap_.at(id).parent_region, re_vector);   //haetaaan station umapista useasti sama tieto->muuttujaan?
+    recursive_parent_regions(stations_umap_.at(id).parent_region, re_vector);
 
     return re_vector;
 }
 
 
-//Apufunktio ylläolevalle
-//The performance of your code is close to the reference implementation. Well done. (10/10)
+
+
+/**
+ * @brief Datastructures::recursive_parent_regions adds each parentregion to the reference-vector
+ * @param id, integer (see .hh file), unique for each region
+ * @param re_vector, reference-vector inholding regionid´s
+ */
 void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
     if (regions_umap_.at(id).parent == NO_REGION)   //parent alustettu no_regioniksi add_regionissa
@@ -413,8 +435,7 @@ void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionI
 // NON-COMPULSORY
 
 //Pitäs onnistua, alialueet löytyy regions_umap.at(id).subregions (usetistä)
-//suoraan rekursio funkkuun? joku parempi tapa kuin loopata jokaista subregionsista löytyvää, kaikki ne on käytävä läpi, lineaarista hommaa kai??
-//NlogN veikkaan, rekursion vuoksi
+
 std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 {
     vector<RegionID> re_vector;

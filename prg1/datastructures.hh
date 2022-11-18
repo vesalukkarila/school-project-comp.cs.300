@@ -117,7 +117,7 @@ public:
     ~Datastructures();
 
     // Estimate of performance: O(1)
-    // Short rationale for estimate: cppreference.com says so
+    // Short rationale for estimate: size() is O(1)
     unsigned int station_count();
 
     // Estimate of performance: O(n)
@@ -133,33 +133,33 @@ public:
     bool add_station(StationID id, Name const& name, Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: worst case linear in the size of the container
+    // Short rationale for estimate: unordered_map.find(): worst case linear
     Name get_station_name(StationID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: worst case linear in the size of the container
+    // Short rationale for estimate: unordered_map.find(): worst case linear
     Coord get_station_coordinates(StationID id);
 
     // We recommend you implement the operations below only after implementing the ones above
 
-    // Estimate of performance: O(n log n)---------------------MUUTA
-    // Short rationale for estimate: Just for a show------------------------------------------------MUUTA
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: sort() algorithm is  O(nlogn) according to cpppreference
     std::vector<StationID> stations_alphabetically();
 
-    // Estimate of performance: O(n)---------------------MUUUTettu
-    // Short rationale for estimate: Just for a show------------------------------------------MUUTA
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: for-loop loops n-times
     std::vector<StationID> stations_distance_increasing();
 
     // Estimate of performance: O(log n)
-    // Short rationale for estimate: map.find is logarithmic in the size of the container
+    // Short rationale for estimate: map.find() is logarithmic in the size of the container
     StationID find_station_with_coord(Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.find most expensive, worst case linear in the size of the container.
+    // Short rationale for estimate: unordered_map.find most expensive, worst case linear->size of the container.
     bool change_station_coord(StationID id, Coord newcoord);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.count most expensive, worst case linear in the size of the container.
+    // Short rationale for estimate: unordered_map.count most expensive, worst case linear->size of the container.
     bool add_departure(StationID stationid, TrainID trainid, Time time);
 
     // Estimate of performance: O(n)
@@ -172,32 +172,32 @@ public:
 
     // We recommend you implement the operations below only after implementing the ones above
 
-    // Estimate of performance: O(1)
-    // Short rationale for estimate: 1-4) Average case: O(1), worst case O(size())?????
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: unordered_map.insert worst case linear
     bool add_region(RegionID id, Name const& name, std::vector<Coord> coords);
 
     // Estimate of performance: O(1)
-    // Short rationale for estimate: only returns a vector
+    // Short rationale for estimate: Only returns an already-built datastructure
     std::vector<RegionID> all_regions();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate:unordered_map: Constant on average, worst case linear in the size of the container.
+    // Short rationale for estimate: unordered_map.find() worst case linear->size of the container.
     Name get_region_name(RegionID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map: Constant on average, worst case linear in the size of the container.
+    // Short rationale for estimate: unordered_map.find() worst case linear->size of the container.
     std::vector<Coord> get_region_coords(RegionID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: Average case: O(1), worst case O(size())
+    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: worst case O(size())
     bool add_subregion_to_region(RegionID id, RegionID parentid);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: Average case: O(1), worst case O(size())
+    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: worst case O(size())
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: Uses recursive function which is n log n--------------------------
+    // Estimate of performance: O(log n)
+    // Short rationale for estimate: Uses recursive function which is logarithmic
     std::vector<RegionID> station_in_regions(StationID id);
 
 
@@ -225,7 +225,6 @@ private:
 
 
     struct station_struct{
-        StationID id;           //turha structissa?? Taitaa olla, siivoa myös add_station&add_region
         Name name;
         Coord coordinates;
         set<pair<Time, TrainID>> trains_set;
@@ -234,7 +233,6 @@ private:
     };
 
     struct region_struct{
-        RegionID id;                        //Huom! unsigned long long int, turha structissa?? Taitaa olla, siivoa myös add_station&add_region
         Name name;
         vector<Coord> coordinates_vector;
 
