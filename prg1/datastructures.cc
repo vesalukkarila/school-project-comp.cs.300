@@ -28,7 +28,8 @@ Type random_in_range(Type start, Type end)
  * @brief Datastructures::Datastructures shows attributes
  */
 Datastructures::Datastructures():
-stations_umap_(), station_vector_(), coord_as_key_map_(), station_vector_sorted_(false),
+stations_umap_(), station_vector_(), coord_as_key_map_(),
+stations_alphabetically_(false), stations_distance_sorted_(false),
 regions_umap_(), region_vector_(),
 all_subregions_(), all_stations_for_regions_()
 
@@ -99,7 +100,8 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
     if ( stations_umap_.insert({id, value}).second ){           // päätietorakenne asemille
         station_vector_.push_back(id);                          // tietorakenne palautuksia varten, kaikki asemat
         coord_as_key_map_.insert({xy, id});                     // find_station_with_coordia varten
-        station_vector_sorted_ = false;                         // stations_alphabetically varten kirjanpito
+        stations_alphabetically_ = false;                         // stations_alphabetically varten kirjanpito
+        stations_distance_sorted_ = false;
         return true;
     }
     return false;
@@ -143,12 +145,13 @@ Coord Datastructures::get_station_coordinates(StationID id)
  */
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
-    if (station_vector_sorted_ == false){
+    if (stations_alphabetically_ == false){
         auto sort_vector = [this] (auto& a, auto& b )
         {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
 
         sort(station_vector_.begin(), station_vector_.end(), sort_vector);
-        station_vector_sorted_ = true;
+        stations_alphabetically_ = true;
+        stations_distance_sorted_ = false;
     }
 
     return station_vector_;
@@ -157,7 +160,9 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 
 
-//HÄN EI TOIMI KUN LAITOIN KOORDINAATIT MAPPIIN, LUULIN ETTÄ JÄRJESTÄÄ SIELLÄ OIKEIN AUTOMAATTISESTI------------------
+//LAMBDA LAITETTU TAKASIN, coordaskeymappia ei enää tarvi voi poistaa---------------------------------------
+//Koita yöllä meneekö graderit läpi, jos menee coodaskeymap pois ja näillä mennään, jos ei mieti tai jos haluaa niin saisko aiemmalla tavalla jotenkin kikkailtua
+// < on jo kuormitettu niin ei varmaan saa coordaskeymappia järjesttyä tuolla matikkakaavalla
 /**
  * @brief Datastructures::stations_distance_increasing copies station-id:s from map to a vector,
  * stations are allready in ascending order by their coordinates in a map
@@ -176,26 +181,19 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
     */
 
 
-    //if stationvectorsortedbycoordinates = true
-    auto sort_vector = [this] (auto& a, auto& b )
-    {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
-                < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);};
+    if (stations_distance_sorted_ == false) {
 
-    sort(station_vector_.begin(), station_vector_.end(), sort_vector);
-    station_vector_sorted_ = false;
+        auto sort_vector = [this] (auto& a, auto& b )
+        {return (sqrt( pow(stations_umap_.at(a).coordinates.x, 2) + pow(stations_umap_.at(a).coordinates.y, 2))
+                    < sqrt( pow(stations_umap_.at(b).coordinates.x, 2) + pow(stations_umap_.at(b).coordinates.y, 2) ) );};
 
+
+        sort(station_vector_.begin(), station_vector_.end(), sort_vector);
+        stations_alphabetically_ = false;
+        stations_distance_sorted_ = true;
+}
 
     return station_vector_;
-
-
-
-    /*
-    auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
-       {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
-                   < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);}; //
-
-       sort(station_vector_.begin(), station_vector_.end(), sort_vector);
-       */
 
 }
 
@@ -231,6 +229,7 @@ bool Datastructures::change_station_coord(StationID id, Coord newcoord)
         it->second.coordinates = newcoord;
         coord_as_key_map_.erase(old_coordinate);
         coord_as_key_map_.insert({newcoord, id});
+        stations_distance_sorted_ = false;
 
         return true;
     }

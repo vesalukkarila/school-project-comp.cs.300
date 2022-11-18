@@ -246,7 +246,8 @@ private:
      unordered_map <StationID, station_struct> stations_umap_;
                             vector<StationID> station_vector_;
                       map<Coord, StationID> coord_as_key_map_;
-                                  bool station_vector_sorted_;
+                                bool stations_alphabetically_;
+                               bool stations_distance_sorted_;
 
                                              //Region related
         unordered_map <RegionID, region_struct> regions_umap_;
