@@ -242,27 +242,24 @@ private:
         RegionID parent;
     };
 
-                                        //Station liittyvät
+                                            //Station related
      unordered_map <StationID, station_struct> stations_umap_;
-                            vector<StationID> station_vector_;  //palautuksia varten
-            map<Coord, StationID> coord_as_key_map_;  //findstationwithcoord varten, huomioi addstation ok, changecoord okja removeall ok
-                                 bool station_vector_sorted_;   //stations_alphabeticallya varten
+                            vector<StationID> station_vector_;
+                      map<Coord, StationID> coord_as_key_map_;
+                                  bool station_vector_sorted_;
 
-                                        //Region liittyvät
+                                             //Region related
         unordered_map <RegionID, region_struct> regions_umap_;
                               vector<RegionID> region_vector_;
-
-                            //3 vikaan vapaaehtoiseen liittyvä
                      unordered_set <RegionID> all_subregions_;
           unordered_set <StationID> all_stations_for_regions_;
 
 
-    //rekursiivinen apufunkku joka kerää alueiden parentit vektoriin
-    //viiteparametrina regionid ja viitevektori johon kerää parentit kunnes ei enää ole
-    void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
+                    //recursive function, called from station_in_regions
+      void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
 
-    //Apufunkku allsubregions_to_regionille
-    void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
+                    //recursive function, called from all_subregions_of_region
+void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
 };
 

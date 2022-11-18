@@ -156,6 +156,8 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 
 
 
+
+//HÄN EI TOIMI KUN LAITOIN KOORDINAATIT MAPPIIN, LUULIN ETTÄ JÄRJESTÄÄ SIELLÄ OIKEIN AUTOMAATTISESTI------------------
 /**
  * @brief Datastructures::stations_distance_increasing copies station-id:s from map to a vector,
  * stations are allready in ascending order by their coordinates in a map
@@ -163,13 +165,38 @@ std::vector<StationID> Datastructures::stations_alphabetically()
  */
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
-
+/*
     vector<StationID> re_vector;
     re_vector.reserve(coord_as_key_map_.size());
     for (auto& key : coord_as_key_map_){
         re_vector.push_back(key.second);
     }
     return re_vector;
+
+    */
+
+
+    //if stationvectorsortedbycoordinates = true
+    auto sort_vector = [this] (auto& a, auto& b )
+    {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
+                < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);};
+
+    sort(station_vector_.begin(), station_vector_.end(), sort_vector);
+    //station_vector_sorted_ = true;
+
+
+    return station_vector_;
+
+
+
+    /*
+    auto sort_vector = [this] (auto& a, auto& b )                                   //lambda jolla...
+       {return sqrt((stations_umap_.at(a).coordinates.x)^2 + (stations_umap_.at(a).coordinates.y)^2)
+                   < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);}; //
+
+       sort(station_vector_.begin(), station_vector_.end(), sort_vector);
+       */
+
 }
 
 
