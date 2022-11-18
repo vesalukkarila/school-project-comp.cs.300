@@ -182,7 +182,7 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
                 < sqrt((stations_umap_.at(b).coordinates.x)^2 + (stations_umap_.at(b).coordinates.y)^2);};
 
     sort(station_vector_.begin(), station_vector_.end(), sort_vector);
-    //station_vector_sorted_ = true;
+    station_vector_sorted_ = false;
 
 
     return station_vector_;
