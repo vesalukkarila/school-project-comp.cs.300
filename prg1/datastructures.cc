@@ -462,16 +462,26 @@ void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionI
 
 //Pitäs onnistua, alialueet löytyy regions_umap.at(id).subregions (usetistä)
 
-std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
+std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID /*id*/)
 {
+    /*
     vector<RegionID> re_vector;
     recursive_subregions_to_regions(id, re_vector);
     return re_vector;
+    */
+
+    // Replace the line below with your implementation
+    // Also uncomment parameters ( /* param */ -> param )
+    throw NotImplemented("stations_closest_to()");
 }
 
+
+/*
+ *
 //Apufunkku yllä olevalle
 void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
+
     if (regions_umap_.at(id).subregions.empty())
         return;
     for (auto& value : regions_umap_.at(id).subregions){
@@ -479,8 +489,12 @@ void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<
         recursive_subregions_to_regions(value, re_vector);
     }
     return;
+
+
+
 }
 
+*/
 
 std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
 {
@@ -495,7 +509,14 @@ bool Datastructures::remove_station(StationID id)
 {
     if (stations_umap_.count(id) == 0)
         return false;
-    stations_umap_.erase(id);
+    stations_umap_.erase(id);   //päätietorakenne
+    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){    //voi tulla iteraattori invalidoitumista
+        if (*it == id){
+
+            station_vector_.erase(it);
+            break;
+        }
+    }
 
     //Jos löytyy tietorakenteesta johon on listattu kaikki alueille alistetut asemat..
     if (all_stations_for_regions_.count(id) == 1){
