@@ -408,7 +408,7 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 }
 
 
-
+//KAHDEN EKAN JÄRJESTYSTÄ VAIHDETTU REMOVE STATIONIN TAKIA------------------------------------VAIHDA TAKAS JA TSEKKAILE MIKÄ JUDU
 /**
  * @brief Datastructures::station_in_regions lists all regions given station belongs to
  * either directly or indirectly. Calls recursive_parent_regions()-function
@@ -420,13 +420,15 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
     vector<RegionID> re_vector;
-    if (all_stations_for_regions_.count(id) == 0)
-        return re_vector;
 
     if (stations_umap_.count(id) == 0 ) {
         re_vector.push_back(NO_REGION);
         return re_vector;
     }
+
+    if (all_stations_for_regions_.count(id) == 0)
+        return re_vector;
+
 
     re_vector.push_back(stations_umap_.at(id).parent_region);
     recursive_parent_regions(stations_umap_.at(id).parent_region, re_vector);
@@ -505,6 +507,7 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
 
 
 //Kato mistä kaikista pitää poistaa, jos toteutat muuta attribuutti joka pitää kirjaa onko station_vectoria muutettu
+//Ihan niiinku station in regionissa ois väärä paluuarvo jossain vaihtoehdossa
 bool Datastructures::remove_station(StationID id)
 {
     if (stations_umap_.count(id) == 0)
