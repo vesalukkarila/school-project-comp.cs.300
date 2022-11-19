@@ -196,7 +196,7 @@ public:
     // Short rationale for estimate: unrdered_map.count&unordered_set.insert: worst case O(size())
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance: O(log n)
+    // Estimate of performance: O(n log n)
     // Short rationale for estimate: Uses recursive function which is logarithmic
     std::vector<RegionID> station_in_regions(StationID id);
 
