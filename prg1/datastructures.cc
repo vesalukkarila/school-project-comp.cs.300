@@ -510,53 +510,7 @@ void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<
     return;
 }
 
-/*
-    struct region_struct{
-        Name name;
-        vector<Coord> coordinates_vector;
 
-        //3 viimeiseen vapaaehtoiseen liittyvät
-        unordered_set <RegionID> subregions;
-        unordered_set <StationID> stations;
-        RegionID parent;
-    };
-
-*/
-
-
-
-/*
-    struct station_struct{
-        Name name;
-        Coord coordinates;
-        set<pair<Time, TrainID>> trains_set;
-        RegionID parent_region;
-
-    };
-
-    struct region_struct{
-        Name name;
-        vector<Coord> coordinates_vector;
-
-        //3 viimeiseen vapaaehtoiseen liittyvät
-        unordered_set <RegionID> subregions;
-        unordered_set <StationID> stations;
-        RegionID parent;
-    };
-
-                                            //Station related
-     unordered_map <StationID, station_struct> stations_umap_;   X   pitää poistaa
-                            vector<StationID> station_vector_;   X   pitää poistaa
-                      map<Coord, StationID> coord_as_key_map_;   X  pitää poistaa, raskas mutta findstationwithcoord hyödyntää tätä ja on siksi nopea
-                                bool stations_alphabetically_;      ei mielestäni tarvi muuttaa, poppaa vain pois aseman
-                               bool stations_distance_sorted_;      ei mielestäni tarvi muuttaa, poppaa vain pois aseman
-
-                                             //Region related
-        unordered_map <RegionID, region_struct> regions_umap_;    X  structista stations-kohdasta pitää poistaa
-                              vector<RegionID> region_vector_;
-                     unordered_set <RegionID> all_subregions_;
-          unordered_set <StationID> all_stations_for_regions_;    X  pitää poistaa
-*/
 
 /**
  * @brief Datastructures::remove_station, if station exists removes it from all datastructures where it´s found
@@ -624,7 +578,7 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
         int second_distance = sqrt( pow(given_x - sec_x, 2) +
                                     pow(given_y - sec_y, 2) );
 
-        if (first_distance == second_distance)          //lyhennetty
+        if (first_distance == second_distance)
             return first_y < sec_y;
         if (first_distance < second_distance)
             return true;
