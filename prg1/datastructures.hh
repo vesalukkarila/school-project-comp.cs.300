@@ -260,6 +260,9 @@ private:
                     //recursive function, called from all_subregions_of_region
 void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
+                            //recursive function for common_parent_of_regions
+    void recursive_parentregions(RegionID const& id, set<RegionID>& parents);
+
 };
 
 #endif // DATASTRUCTURES_HH

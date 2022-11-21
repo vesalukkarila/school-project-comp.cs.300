@@ -411,7 +411,7 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 }
 
 
-//KAHDEN EKAN JÄRJESTYSTÄ VAIHDETTU REMOVE STATIONIN TAKIA------------------------------------VAIHDA TAKAS JA TSEKKAILE MIKÄ JUDU
+
 /**
  * @brief Datastructures::station_in_regions lists all regions given station belongs to
  * either directly or indirectly. Calls recursive_parent_regions()-function
@@ -455,9 +455,6 @@ void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionI
     recursive_parent_regions(regions_umap_.at(id).parent, re_vector);   //rekursiokutsu parentin id:llä
     return;
 }
-
-
-
 
 
 
@@ -512,6 +509,7 @@ void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<
 
 
 
+
 /**
  * @brief Datastructures::remove_station, if station exists removes it from all datastructures where it´s found
  * @param id, string (StationId, kts .hh), unique id for station
@@ -554,6 +552,7 @@ bool Datastructures::remove_station(StationID id)
     }
     return true;
 }
+
 
 
 
@@ -603,13 +602,47 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 
 
 
-RegionID Datastructures::common_parent_of_regions(RegionID /*id1*/, RegionID /*id2*/)
+/**
+ * @brief Datastructures::common_parent_of_regions finds the first common parent of given regions if such exists
+ * @param id1,  unsigned long long int, unique id for each region
+ * @param id2,  unsigned long long int, unique id for each region
+ * @return regionid to the first common parent if found, otherwise NO_REGION
+ */
+RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("common_parent_of_regions()");
+    if (regions_umap_.count(id1) == 0 || regions_umap_.count(id2) == 0)
+        return NO_REGION;
+
+    set <RegionID> id1_parents;
+    set <RegionID> id2_parents;
+    recursive_parentregions(id1, id1_parents);
+    recursive_parentregions(id2, id2_parents);
+    for (auto& value : id1_parents){
+        if ( id2_parents.count(value) == 1){
+            return value;
+        }
+    }
+
+    return NO_REGION;
+
 }
 
+
+
+/**
+ * @brief Datastructures::recursive_all_parentregions
+ * @param id, unsigned long long int, unique id for each region
+ * @param parents, referenced set with regionid:s
+ */
+void Datastructures::recursive_parentregions(const RegionID &id, set<RegionID> &parents)
+{
+    RegionID parent = regions_umap_.at(id).parent;
+    if ( parent == NO_REGION)
+        return;
+    parents.insert(parent);
+    recursive_parentregions(parent, parents);
+
+}
 
 
 
