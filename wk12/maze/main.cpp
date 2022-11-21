@@ -490,92 +490,76 @@ int testConnectNodes(int test_id) {
   return EXIT_SUCCESS;
 }
 
+
 /**
- * @brief creates the nodes and connects them
- * @param locations - a vector of node locations 
- * @param paths - a vector of paths from start node to end node
- * @return a pair of nodes, the first node is the start node, the second node is the end node
+ * @brief Creates the maze and returns the start and end node
+ * 
+ * @param maze - the maze locations 
+ * @param shortestPathway - the shortest pathway from start to end
+ * @param longestPathway - the longest pathway from start to end
+ * @return std::pair<Node*, Node*> 
  */
-std::pair<Node*, Node*> createNodes(std::vector<std::pair<int,int>> locations, std::vector<std::pair<int, int>> paths) {
+std::pair<Node*, Node*> createMaze(std::vector<std::pair<int, int>> maze, std::vector<std::pair<int, int>> shortestPathway, std::vector<std::pair<int, int>> longestPathway) {
   std::map<std::string, Node*> startingPaths = {{"left", nullptr}, {"above", nullptr}, {"right", nullptr}, {"below", nullptr}};
-  // Create a container for nodes to connect where key is the index of the location in the paths vector and value is the node of that location
-  std::map<int, Node *> nodesToConnect;
-  std::cout << "Creating nodes with createNode and connecting the nodes with connectNodes (both need to work at this stage)" << std::endl;
-  for (auto location : locations) {
+  // Create a container for the shortest path from start to end
+  std::map<int, Node *> shortestPathNodesToConnect;
+  // Create a container for a longer path than the shortest path from start to end
+  std::map<int, Node *> longestPathNodesToConnect;
+
+  // Varaible for the start location
+  std::pair<int, int> startLocation = shortestPathway[0];
+  // Variable for the end location
+  std::pair<int, int> endLocation = shortestPathway[shortestPathway.size() - 1];
+  // variable for saving starting node
+  Node* startNode;
+  // variable for saving end node
+  Node* endNode;
+  for (std::pair<int,int> location : maze) {
+
     Node* node = createNode(location, startingPaths);
+    // If the location is the start location, save the node as the start node
+    if (location == startLocation) {
+      startNode = node;
+    }
 
-    // use std algorithm to find the location in paths
-    auto it = std::find(paths.begin(), paths.end(), location);
-    if (it != paths.end()) {
-      // Add the node to the nodesToConnect map with the index of the location in paths as the key and the node as the value
-      // Find it index in the paths vector
-      int index = std::distance(paths.begin(), it);
-      nodesToConnect[index] = node;
+    // If the location is the end location, save the node as the end node
+    else if (location == endLocation) {
+      endNode = node;
     }
-  }
-  // Connect the nodes 
-  for (unsigned long int i = 1; i < nodesToConnect.size(); ++i) {
-    connectNodes(*nodesToConnect[i-1], *nodesToConnect[i]);
-  }
+    // Check to see if the location is at shortestPathway
 
-  // In the next part, we generate random dead ends to the maze. 
-  // generate a random integer between 0 and nodesToConnect.size() - 1
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dis(0, paths.size() - 1);
-  for (int i = 0; i < 5; ++i) {
-    // Get the node at the random index
-    int randomInteger = dis(gen);
-    // get the node at the random index
-    Node* randomNode = nodesToConnect[randomInteger];
-    std::pair<int,int> randomNodesLocation = paths[randomInteger];
-    // List possible dead end paths
-    for (int i = 0; i < 4;  ++i) {
+    auto it = std::find(shortestPathway.begin(), shortestPathway.end(), location);
+      if (it != shortestPathway.end()) {
+      // Find its index in the paths vector
+      int index = std::distance(shortestPathway.begin(), it);
+      // Add the node to the shortestPathNodesToConnect map at the index
+      shortestPathNodesToConnect[index] = node;
+    }
+    // Check to see if the location is at longestPathway
+    auto it2 = std::find(longestPathway.begin(), longestPathway.end(), location);
+    if (it2 != longestPathway.end()) {
+      // Find its index in the paths vector
+      int index = std::distance(longestPathway.begin(), it2);
+      // Add the node to the longestPathNodesToConnect map at the index
+      longestPathNodesToConnect[index] = node;
+    }
 
-      std::vector<std::string> deadEndPaths = {"left", "above", "right", "below"};
-    // Go through all the paths and remove the ones that are connected
-    for (auto path : deadEndPaths) {
-      if (getNeighbour(path, *randomNode) != nullptr) {
-        deadEndPaths.erase(std::remove(deadEndPaths.begin(), deadEndPaths.end(), path), deadEndPaths.end());
-      }
-    }
-    // Get a random neighbour from the dead end paths
-    std::uniform_int_distribution<> dis(0, deadEndPaths.size());
-    int randomDeadEndIndex = dis(gen);
-    std::string deadEndPath = deadEndPaths[randomDeadEndIndex];
-    // Create a new location based on the dead end path and the current location
-    std::pair<int,int> newLocation = randomNodesLocation;
-    if (deadEndPath == "left") {
-      newLocation.first -= 1;
-    } else if (deadEndPath == "above") {
-      newLocation.second += 1;
-    } else if (deadEndPath == "right") {
-      newLocation.first += 1;
-    } else if (deadEndPath == "below") {
-      newLocation.second -= 1;
-    }
-    // Check if the newLocation exists in the locations vector
-    auto l_it = std::find(locations.begin(), locations.end(), newLocation);
-    if (l_it == locations.end()) {
-      // stop the loop if the new location doesn't exist in the locations vector (aka maze grid)
-      break;
-    }
-    // Check if the new node is already in the nodesToConnect map: we dont want to relink to the nodes that are on the correct path to the end node
-    auto p_it = std::find(paths.begin(), paths.end(), newLocation);
-    if (p_it == paths.end()) {
-      // Create a new node at the new location
-      Node* newNode = createNode(newLocation, startingPaths);
-      // Connect the new node to the random node
-      connectNodes(*randomNode, *newNode);
-      randomNode = newNode;
-      randomNodesLocation = newLocation;
-    }
-    }
   }
 
 
-  return std::make_pair(nodesToConnect[0], nodesToConnect[nodesToConnect.size()-1]);
+
+  // Connect the nodes in the shortest path
+  for (int i = 1; i < shortestPathway.size(); ++i) {
+    connectNodes(*shortestPathNodesToConnect[i-1], *shortestPathNodesToConnect[i]);
+  }
+  // Connect the nodes in the longest path
+  for (int i = 1; i < longestPathway.size(); ++i) {
+    connectNodes(*longestPathNodesToConnect[i-1], *longestPathNodesToConnect[i]);
+  }
+  return std::make_pair(startNode, endNode);
+
 }
+
 
 /**
  * @brief Test the function findShortestPath
@@ -599,15 +583,20 @@ int testFindShortestPath(int test_id) {
   std::vector<std::pair<int,int>> lPath = {
     {1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 5}, {3, 5}, {4, 5}, {5, 5}
   };
-  // Add distractions to lPath
+  // create a snake path from {1, 1} to {5, 5} in the maze grid
+  std::vector<std::pair<int,int>> snakePath = {
+    {1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, {5, 2}, {4, 2}, {3, 2}, {2, 2}, {2,3}, {3, 3}, {4, 3}, {5, 3}, {5, 4}, {5, 5}
+  };
+
+
   // Create a pi shaped path from {1, 1} to {5, 1} in the maze grid
   std::vector<std::pair<int,int>> piPath = {
     {1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 5}, {3, 5}, {4, 5}, {5, 5}, {5, 4}, {5, 3}, {5, 2}, {5, 1}
   };
+  std::vector<std::pair<int,int>> straightPath = {
+    {1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}
+  };
 
-  // Create a G shaped path from {5, 5} to {3, 3} in the maze grid
-  std::vector<std::pair<int, int>> gPath = {
-      {5, 5}, {4, 5}, {3, 5}, {2, 5}, {1, 5}, {1, 4}, {1, 3}, {1, 2}, {1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, {5, 2}, {5, 3}, {4, 3}, {3, 3}};
 
   std::vector<std::pair<int, int>> shortestPath;
 
@@ -618,8 +607,8 @@ int testFindShortestPath(int test_id) {
     // Test that the shortest path is found and that the length of the vector is the shortest path
     std::string description = "Test that the shortest path is found and that the size of the vector is the shortest path: " + std::to_string(lPath.size());
     printDescription(description);
-    // use createNodes to create the nodes and connect them
-    std::pair<Node *, Node *> nodes = createNodes(locations, lPath);
+    // use createMaze to create the nodes and connect them
+    std::pair<Node *, Node *> nodes =   createMaze(locations, lPath, snakePath);
     Node *startNode = nodes.first;
     Node* endNode = nodes.second;
     // Find the shortest path
@@ -636,20 +625,21 @@ int testFindShortestPath(int test_id) {
     // Test that returned vector has all the locations in the shortest path from start to end
     std::string description = "Test that returned vector has all the locations in the shortest path from start to end";
     printDescription(description);
-    // use createNodes to create the nodes and connect them
-    std::pair<Node *, Node *> nodes = createNodes(locations, lPath);
+    // use createMaze to create the nodes and connect them
+    std::pair<Node *, Node *> nodes =   createMaze(locations, straightPath, piPath);
+
     Node *startNode = nodes.first;
     Node* endNode = nodes.second;
     // Find the shortest path
     bool found = findShortestPath(*startNode, *endNode, shortestPath);
-    // Check that the shortest path is found and it's equal to the lPath vector
+    // Check that the shortest path is found and it's equal to the straightPath vector
     if(found) {
 
     std::cout << "EXPECTED vector: " << std::endl;
-    printVectorOfPairs(lPath);
+    printVectorOfPairs(straightPath);
     std::cout << "RETURNED vector " << std::endl;
     printVectorOfPairs(shortestPath);
-    if(shortestPath == lPath) {
+    if(shortestPath == straightPath) {
       std::cout << "SUCCESS: The shortest path is found and it's equal to the lPath vector" << std::endl;
     } else {
       std::cout << "FAILURE: The shortest path is not found or it's not equal to the lPath vector" << std::endl;
@@ -666,8 +656,8 @@ int testFindShortestPath(int test_id) {
     std::string description = "Test that the shortest path is found to be 0 when the start and end node are the same";
     printDescription(description);
 
-    // use createNodes to create the nodes and connect them
-    std::pair<Node *, Node *> nodes = createNodes(locations, lPath);
+    // use createMaze to create the nodes and connect them
+    std::pair<Node *, Node *> nodes =   createMaze(locations, lPath, snakePath);
   
     Node *startNode = nodes.first;
     Node* endNode = nodes.first;
@@ -690,8 +680,8 @@ int testFindShortestPath(int test_id) {
     std::string description = "Test that the shortest path is not found when the start and end node are not connected";
     printDescription(description);
 
-    // use createNodes to create the nodes and connect them
-    std::pair<Node *, Node *> nodes = createNodes(locations, lPath);
+    // use createMaze to create the nodes and connect them
+    std::pair<Node *, Node *> nodes = createMaze(locations, lPath, snakePath);
     Node *startNode = nodes.first;
     // create paths for a node
 
@@ -717,6 +707,7 @@ int testFindShortestPath(int test_id) {
   }
   return EXIT_SUCCESS;
 }
+
 
 int test(int func_id, int test_id)
 {

@@ -18,4 +18,4 @@ using namespace std;
 void connectNodes(Node& node1, Node& node2) {
     std::cout << "connectNodes not implemented" << std::endl;
     // Student code here to connect the nodes together
-}   
+}
