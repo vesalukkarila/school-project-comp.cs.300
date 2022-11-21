@@ -158,34 +158,8 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 }
 
 
-/*
 
-bool Datastructures::sort_by_distance(StationID &a, StationID &b)
-{
-    int first_x = stations_umap_.at(a).coordinates.x;
-    int first_y = stations_umap_.at(a).coordinates.y;
-    int second_x = stations_umap_.at(b).coordinates.x;
-    int second_y = stations_umap_.at(b).coordinates.y;
-    int calcute_first = sqrt ( pow(first_x,2) + pow(first_y, 2));
-    int calculate_second = sqrt ( pow(second_x,2) + pow(second_y, 2) );
 
-    if ( calcute_first == calculate_second ){
-        if (first_y < second_y)
-            return true;
-        else
-            return false;
-    }
-    if ( calcute_first < calculate_second)
-        return true;
-    else
-        return false;
-}
-
-*/
-
-//LAMBDA LAITETTU TAKASIN, coordaskeymappia ei enää tarvi voi poistaa---------------------------------------
-//Koita yöllä meneekö graderit läpi, jos menee coodaskeymap pois ja näillä mennään, jos ei mieti tai jos haluaa niin saisko aiemmalla tavalla jotenkin kikkailtua
-// < on jo kuormitettu niin ei varmaan saa coordaskeymappia järjesttyä tuolla matikkakaavalla
 /**
  * @brief Datastructures::stations_distance_increasing copies station-id:s from map to a vector,
  * stations are allready in ascending order by their coordinates in a map
@@ -193,16 +167,6 @@ bool Datastructures::sort_by_distance(StationID &a, StationID &b)
  */
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
-/*
-    vector<StationID> re_vector;
-    re_vector.reserve(coord_as_key_map_.size());
-    for (auto& key : coord_as_key_map_){
-        re_vector.push_back(key.second);
-    }
-    return re_vector;
-
-    */
-
 
     if (stations_distance_sorted_ == false) {
 
@@ -223,16 +187,13 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
             if ( calcute_first < calculate_second)
                 return true;
             else
-                return false; ;};
+                return false; ; };
 
 
-
-        /*(sqrt( pow(stations_umap_.at(a).coordinates.x, 2) + pow(stations_umap_.at(a).coordinates.y, 2))
-                    < sqrt( pow(stations_umap_.at(b).coordinates.x, 2) + pow(stations_umap_.at(b).coordinates.y, 2) ) )*/
         sort(station_vector_.begin(), station_vector_.end(), sort_vector);
         stations_alphabetically_ = false;
         stations_distance_sorted_ = true;
-}
+    }
 
     return station_vector_;
 
@@ -517,7 +478,7 @@ std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID /*id*/)
 
     // Replace the line below with your implementation
     // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("stations_closest_to()");
+    throw NotImplemented("all_subregions_of_region()");
 }
 
 
@@ -549,19 +510,59 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
 }
 
 
-//Kato mistä kaikista pitää poistaa, jos toteutat muuta attribuutti joka pitää kirjaa onko station_vectoria muutettu
+/*
+    struct station_struct{
+        Name name;
+        Coord coordinates;
+        set<pair<Time, TrainID>> trains_set;
+        RegionID parent_region;
+
+    };
+
+    struct region_struct{
+        Name name;
+        vector<Coord> coordinates_vector;
+
+        //3 viimeiseen vapaaehtoiseen liittyvät
+        unordered_set <RegionID> subregions;
+        unordered_set <StationID> stations;
+        RegionID parent;
+    };
+
+                                            //Station related
+     unordered_map <StationID, station_struct> stations_umap_;   X   pitää poistaa
+                            vector<StationID> station_vector_;   X   pitää poistaa
+                      map<Coord, StationID> coord_as_key_map_;   X  pitää poistaa, raskas mutta findstationwithcoord hyödyntää tätä ja on siksi nopea
+                                bool stations_alphabetically_;      ei mielestäni tarvi muuttaa, poppaa vain pois aseman
+                               bool stations_distance_sorted_;      ei mielestäni tarvi muuttaa, poppaa vain pois aseman
+
+                                             //Region related
+        unordered_map <RegionID, region_struct> regions_umap_;    X  structista stations-kohdasta pitää poistaa
+                              vector<RegionID> region_vector_;
+                     unordered_set <RegionID> all_subregions_;
+          unordered_set <StationID> all_stations_for_regions_;    X  pitää poistaa
+*/
 //Ihan niiinku station in regionissa ois väärä paluuarvo jossain vaihtoehdossa
 bool Datastructures::remove_station(StationID id)
 {
     if (stations_umap_.count(id) == 0)
         return false;
-    stations_umap_.erase(id);   //päätietorakenne
-    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){    //voi tulla iteraattori invalidoitumista
+    stations_umap_.erase(id);   //päätietorakenne, stations_umapista
+    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){    //station_vectorista, voi tulla iteraattori invalidoitumista(?)
         if (*it == id){
 
             station_vector_.erase(it);
             break;
         }
+    }
+
+    //poisto coordaskeymapista
+    for (auto& [k,v] : coord_as_key_map_){
+        if (v == id){
+            coord_as_key_map_.erase(k);
+            break;
+        }
+
     }
 
     //Jos löytyy tietorakenteesta johon on listattu kaikki alueille alistetut asemat..
@@ -572,6 +573,7 @@ bool Datastructures::remove_station(StationID id)
         for ( auto& [k,v] : regions_umap_){
             if ( v.stations.count(id) == 1){
                 v.stations.erase(id);
+                break;
             }
         }
     }

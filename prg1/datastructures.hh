@@ -256,8 +256,6 @@ private:
           unordered_set <StationID> all_stations_for_regions_;
 
 
-                         // bool sort_by_distance (StationID& a, StationID& b); ----------------------------pois jos ei tarvi
-
                     //recursive function, called from station_in_regions
        void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
 
