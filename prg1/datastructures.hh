@@ -197,7 +197,7 @@ public:
     bool add_station_to_region(StationID id, RegionID parentid);
 
     // Estimate of performance: O(n log n)
-    // Short rationale for estimate: Uses recursive function which is logarithmic
+    // Short rationale for estimate: Uses recursive function which makes it n log n
     std::vector<RegionID> station_in_regions(StationID id);
 
 
@@ -256,8 +256,10 @@ private:
           unordered_set <StationID> all_stations_for_regions_;
 
 
+                         // bool sort_by_distance (StationID& a, StationID& b); ----------------------------pois jos ei tarvi
+
                     //recursive function, called from station_in_regions
-      void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
+       void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
 
                     //recursive function, called from all_subregions_of_region
 void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);

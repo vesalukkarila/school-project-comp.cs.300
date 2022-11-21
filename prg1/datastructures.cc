@@ -158,7 +158,30 @@ std::vector<StationID> Datastructures::stations_alphabetically()
 }
 
 
+/*
 
+bool Datastructures::sort_by_distance(StationID &a, StationID &b)
+{
+    int first_x = stations_umap_.at(a).coordinates.x;
+    int first_y = stations_umap_.at(a).coordinates.y;
+    int second_x = stations_umap_.at(b).coordinates.x;
+    int second_y = stations_umap_.at(b).coordinates.y;
+    int calcute_first = sqrt ( pow(first_x,2) + pow(first_y, 2));
+    int calculate_second = sqrt ( pow(second_x,2) + pow(second_y, 2) );
+
+    if ( calcute_first == calculate_second ){
+        if (first_y < second_y)
+            return true;
+        else
+            return false;
+    }
+    if ( calcute_first < calculate_second)
+        return true;
+    else
+        return false;
+}
+
+*/
 
 //LAMBDA LAITETTU TAKASIN, coordaskeymappia ei enää tarvi voi poistaa---------------------------------------
 //Koita yöllä meneekö graderit läpi, jos menee coodaskeymap pois ja näillä mennään, jos ei mieti tai jos haluaa niin saisko aiemmalla tavalla jotenkin kikkailtua
@@ -184,10 +207,28 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
     if (stations_distance_sorted_ == false) {
 
         auto sort_vector = [this] (auto& a, auto& b )
-        {return (sqrt( pow(stations_umap_.at(a).coordinates.x, 2) + pow(stations_umap_.at(a).coordinates.y, 2))
-                    < sqrt( pow(stations_umap_.at(b).coordinates.x, 2) + pow(stations_umap_.at(b).coordinates.y, 2) ) );};
+        {   int first_x = stations_umap_.at(a).coordinates.x;
+            int first_y = stations_umap_.at(a).coordinates.y;
+            int second_x = stations_umap_.at(b).coordinates.x;
+            int second_y = stations_umap_.at(b).coordinates.y;
+            int calcute_first = sqrt ( pow(first_x,2) + pow(first_y, 2));
+            int calculate_second = sqrt ( pow(second_x,2) + pow(second_y, 2) );
+
+            if ( calcute_first == calculate_second ){
+                if (first_y < second_y)
+                    return true;
+                else
+                    return false;
+            }
+            if ( calcute_first < calculate_second)
+                return true;
+            else
+                return false; ;};
 
 
+
+        /*(sqrt( pow(stations_umap_.at(a).coordinates.x, 2) + pow(stations_umap_.at(a).coordinates.y, 2))
+                    < sqrt( pow(stations_umap_.at(b).coordinates.x, 2) + pow(stations_umap_.at(b).coordinates.y, 2) ) )*/
         sort(station_vector_.begin(), station_vector_.end(), sort_vector);
         stations_alphabetically_ = false;
         stations_distance_sorted_ = true;
@@ -196,6 +237,8 @@ std::vector<StationID> Datastructures::stations_distance_increasing()
     return station_vector_;
 
 }
+
+
 
 
 
@@ -543,6 +586,7 @@ RegionID Datastructures::common_parent_of_regions(RegionID /*id1*/, RegionID /*i
     // Also uncomment parameters ( /* param */ -> param )
     throw NotImplemented("common_parent_of_regions()");
 }
+
 
 
 
