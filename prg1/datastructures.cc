@@ -640,10 +640,11 @@ RegionID Datastructures::recursive_parentregions(const RegionID &id, set<RegionI
     RegionID parent = regions_umap_.at(id).parent;
     if ( parent == NO_REGION)
         return NO_REGION;
-    if ( parents.insert(parent).second)
-        recursive_parentregions(parent, parents);
+    if ( parents.insert(parent).second)  {       //jos parentin lisäys settiin onnistuu, sitä ei ole siellä vielä
+        return recursive_parentregions(parent, parents);
 
-    return id;
+    }
+    return parent;
     //ei vittu mitä tän pitää palauttaa, melkein toimii
 }
 
