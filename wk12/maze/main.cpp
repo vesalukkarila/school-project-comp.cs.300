@@ -701,6 +701,7 @@ int testFindShortestPath(int test_id) {
     std::cout << "1: Test that the shortest path is found and that the length of the vector is the shortest path" << std::endl;
     std::cout << "2: Test that returned vector has all the nodes in the shortest path, in the correct order (from start to end)" << std::endl;
     std::cout << "3: Test that the shortest path is found to be 0 when the start and end node are the same" << std::endl;
+    std::cout << "4: Test that the shortest path is not found when the start and end node are not connected" << std::endl;
 
     return INVALID_TEST_CASE;
   }
