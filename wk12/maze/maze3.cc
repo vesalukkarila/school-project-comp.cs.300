@@ -14,7 +14,6 @@ using namespace std;
  * 
  * @param fromNode  The node to connect from
  * @param toNode  The node to connect to
- * @param direction  The direction to connect the fromNode to the toNode
  */
 void connectNodes(Node& node1, Node& node2) {
     std::cout << "connectNodes not implemented" << std::endl;
