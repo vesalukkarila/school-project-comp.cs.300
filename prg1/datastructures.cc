@@ -637,8 +637,13 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
     sort(station_vector_.begin(), station_vector_.end(), distance_between);
     stations_alphabetically_ = false;
     stations_distance_sorted_ = false;
-    for (int max_three = 0; max_three < 3; max_three++){
-        re_vector.push_back(station_vector_[max_three]);
+    int counter = 0;
+    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){
+        re_vector.push_back(*it);
+        ++counter;
+        if (counter >2)
+            break;
+
     }
     return re_vector;
 
