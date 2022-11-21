@@ -306,7 +306,6 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
 
 
 
-//sisällä kommentti, vapaaehtoisiin liittyen------------------------------------------
 /**
  * @brief Datastructures::add_region adds a region to related datastructures if one doesn´t exist before
  * @param id, integer (see .hh file), unique for each region
@@ -319,7 +318,7 @@ bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord
     region_struct value = {name, coords, {}, {}, NO_REGION};
     if ( regions_umap_.insert({id, value}).second ){
         region_vector_.push_back(id);
-                                                        //TÄHÄN jos lisää region id osoituksia varten toiseen tietorakenteeseen!!!!
+
         return true;
     }
     return false;
@@ -604,12 +603,13 @@ bool Datastructures::remove_station(StationID id)
 
 
 
-//etäisyysjärjestyksessä kolme annettuakoordinaattia lähinnä olevaa asemaa.
-//Jos ei ole kolmea asemaa (olemassa tietorakenteessa), palautetaan ne mitä on
+/**
+ * @brief Datastructures::stations_closest_to finds three closest station to given coordinates
+ * @param xy, struct that inholds integers as x- and y-coordinates
+ * @return a vector with max three stationid:s sorted ascendically by distance from given coordinates
+ */
 std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 {
-    //jos sorttais station_vectoria coord_as_key_mapin avulla lambdalla ja lisäis max 3 ekaa paluuvektoriin ja muuttaa 2 booleania falseksi
-
     vector <StationID> re_vector;
     auto distance_between = [xy, this](auto& a, auto& b)
     {
@@ -630,8 +630,6 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
             return true;
         return false;
 
-
-
         ;};
 
     sort(station_vector_.begin(), station_vector_.end(), distance_between);
@@ -643,11 +641,11 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
         ++counter;
         if (counter >2)
             break;
-
     }
-    return re_vector;
 
+    return re_vector;
 }
+
 
 
 

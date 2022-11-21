@@ -146,8 +146,8 @@ public:
     // Short rationale for estimate: sort() algorithm is  O(nlogn) according to cpppreference
     std::vector<StationID> stations_alphabetically();
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: for-loop loops n-times
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: sort function is n log n according to cppreference
     std::vector<StationID> stations_distance_increasing();
 
     // Estimate of performance: O(log n)
@@ -208,8 +208,8 @@ public:
     // Short rationale for estimate: recursive function with for-loop
     std::vector<RegionID> all_subregions_of_region(RegionID id);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: sort function is O(n log n) according to cppreference
     std::vector<StationID> stations_closest_to(Coord xy);
 
     // Estimate of performance: O(n)
@@ -235,8 +235,6 @@ private:
     struct region_struct{
         Name name;
         vector<Coord> coordinates_vector;
-
-        //3 viimeiseen vapaaehtoiseen liittyvät
         unordered_set <RegionID> subregions;
         unordered_set <StationID> stations;
         RegionID parent;
