@@ -261,7 +261,7 @@ private:
 void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
                             //recursive function for common_parent_of_regions
-    void recursive_parentregions(RegionID const& id, set<RegionID>& parents);
+    RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
 
 };
 

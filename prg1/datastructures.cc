@@ -37,6 +37,8 @@ all_subregions_(), all_stations_for_regions_()
 
 }
 
+
+
 /**
  * @brief Datastructures::~Datastructures no implemetation here
  */
@@ -44,6 +46,7 @@ Datastructures::~Datastructures()
 {
     // Write any cleanup you need here
 }
+
 
 
 /**
@@ -58,7 +61,7 @@ unsigned int Datastructures::station_count()
 
 
 /**
- * @brief Datastructures::clear_all clears all datastructures used
+ * @brief Datastructures::clear_all clears all 7 datastructures used
  */
 void Datastructures::clear_all()
 {
@@ -76,6 +79,7 @@ void Datastructures::clear_all()
 
 
 
+
 /**
  * @brief Datastructures::all_stations this function´s work has been done in add station
  * @return all station-id:s in a unsorted vector
@@ -86,7 +90,8 @@ std::vector<StationID> Datastructures::all_stations()
 }
 
 
-//tekstiä sisällä -------------------------------------------------------------
+
+
 /**
  * @brief Datastructures::add_station adds data about stations in necessary datastructures
  * @param id, string, id of the station, unique for each station
@@ -100,8 +105,8 @@ bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
     if ( stations_umap_.insert({id, value}).second ){           // päätietorakenne asemille
         station_vector_.push_back(id);                          // tietorakenne palautuksia varten, kaikki asemat
         coord_as_key_map_.insert({xy, id});                     // find_station_with_coordia varten
-        stations_alphabetically_ = false;                         // stations_alphabetically varten kirjanpito
-        stations_distance_sorted_ = false;
+        stations_alphabetically_ = false;                       // stations_alphabetically varten kirjanpito
+        stations_distance_sorted_ = false;                      // stations_distance_increasing varten kirjanpito
         return true;
     }
     return false;
@@ -298,9 +303,7 @@ std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(S
             if (departure_time >= time)
                 re_vector.push_back({departure_time, train});
         }
-
     }
-
     return re_vector;
 }
 
@@ -412,6 +415,7 @@ bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 
 
 
+
 /**
  * @brief Datastructures::station_in_regions lists all regions given station belongs to
  * either directly or indirectly. Calls recursive_parent_regions()-function
@@ -449,10 +453,10 @@ std::vector<RegionID> Datastructures::station_in_regions(StationID id)
  */
 void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
-    if (regions_umap_.at(id).parent == NO_REGION)   //parent alustettu no_regioniksi add_regionissa
+    if (regions_umap_.at(id).parent == NO_REGION)
         return;
-    re_vector.push_back(regions_umap_.at(id).parent);   //Lisää parentin vektoriin, yllä tarkistettu sen olemassa olo
-    recursive_parent_regions(regions_umap_.at(id).parent, re_vector);   //rekursiokutsu parentin id:llä
+    re_vector.push_back(regions_umap_.at(id).parent);
+    recursive_parent_regions(regions_umap_.at(id).parent, re_vector);
     return;
 }
 
@@ -614,15 +618,17 @@ RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
         return NO_REGION;
 
     set <RegionID> id1_parents;
-    set <RegionID> id2_parents;
+   // set <RegionID> id2_parents;
     recursive_parentregions(id1, id1_parents);
-    recursive_parentregions(id2, id2_parents);
+    return recursive_parentregions(id2, id1_parents);
+
+    /*
     for (auto& value : id1_parents){
         if ( id2_parents.count(value) == 1){
             return value;
         }
     }
-
+*/
     return NO_REGION;
 
 }
@@ -634,13 +640,16 @@ RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
  * @param id, unsigned long long int, unique id for each region
  * @param parents, referenced set with regionid:s
  */
-void Datastructures::recursive_parentregions(const RegionID &id, set<RegionID> &parents)
+RegionID Datastructures::recursive_parentregions(const RegionID &id, set<RegionID> &parents)
 {
     RegionID parent = regions_umap_.at(id).parent;
     if ( parent == NO_REGION)
-        return;
-    parents.insert(parent);
-    recursive_parentregions(parent, parents);
+        return NO_REGION;                       //jos ei ole parenttia niin yhteistä ei ole löytynyt
+    if ( parents.insert(parent).second)         //jos lisäys onnistuu, ei se ole vielä yhteinen
+        recursive_parentregions(parent, parents);
+
+
+    return parent;  //jos lisäys settiin  ei onnistu, on kyseinen jos setissä
 
 }
 
