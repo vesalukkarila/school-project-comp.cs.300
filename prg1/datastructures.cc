@@ -568,7 +568,7 @@ bool Datastructures::remove_station(StationID id)
 std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 {
     vector <StationID> re_vector;
-    auto distance_between = [xy, this](auto& a, auto& b)
+    auto distance_between = [&xy, this](auto& a, auto& b)
     {
         int given_x = xy.x;
         int given_y = xy.y;
@@ -629,23 +629,22 @@ RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
 
 
 /**
- * @brief Datastructures::recursive_parentregions adds parents in one datastructure,
- * if insertion fails the first common parent has been found
+ * @brief Datastructures::recursive_parentregions tries to add parent in referenced
+ * datastructure, if insertion fails the first common parent has been found
  * @param id, unsigned long long int, unique id for each region
  * @param parents, referenced set with regionid:s
- * @return regionid of common parent if such found toherwise NO_REGION
+ * @return regionid of first common parent if such found toherwise NO_REGION
  */
 RegionID Datastructures::recursive_parentregions(const RegionID &id, set<RegionID> &parents)
 {
     RegionID parent = regions_umap_.at(id).parent;
     if ( parent == NO_REGION)
         return NO_REGION;
-    if ( parents.insert(parent).second)  {       //jos parentin lisäys settiin onnistuu, sitä ei ole siellä vielä
+    if ( parents.insert(parent).second)
         return recursive_parentregions(parent, parents);
 
-    }
     return parent;
-    //ei vittu mitä tän pitää palauttaa, melkein toimii
+
 }
 
 

@@ -217,7 +217,7 @@ public:
     bool remove_station(StationID id);
 
     // Estimate of performance: O(n log n)
-    // Short rationale for estimate: recursive called twice
+    // Short rationale for estimate: recursive function called twice
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
 
@@ -225,19 +225,19 @@ private:
 
 
     struct station_struct{
-        Name name;
-        Coord coordinates;
+                                  Name name;
+                          Coord coordinates;
         set<pair<Time, TrainID>> trains_set;
-        RegionID parent_region;
+                     RegionID parent_region;
 
     };
 
     struct region_struct{
-        Name name;
-        vector<Coord> coordinates_vector;
+                                  Name name;
+           vector<Coord> coordinates_vector;
         unordered_set <RegionID> subregions;
-        unordered_set <StationID> stations;
-        RegionID parent;
+         unordered_set <StationID> stations;
+                            RegionID parent;
     };
 
                                             //Station related
@@ -254,14 +254,14 @@ private:
           unordered_set <StationID> all_stations_for_regions_;
 
 
-                    //recursive function, called from station_in_regions
+                         //recursive function, called from station_in_regions
        void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
 
-                    //recursive function, called from all_subregions_of_region
+                   //recursive function, called from all_subregions_of_region
 void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
                             //recursive function for common_parent_of_regions
-    RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
+ RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
 
 };
 
