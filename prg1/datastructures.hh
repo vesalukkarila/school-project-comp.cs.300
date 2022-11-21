@@ -204,8 +204,8 @@ public:
 
     // EI-PAKOLLISET Non-compulsory operations
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: recursive function with for-loop
     std::vector<RegionID> all_subregions_of_region(RegionID id);
 
     // Estimate of performance:

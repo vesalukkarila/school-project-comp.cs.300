@@ -466,23 +466,26 @@ void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionI
 
 // NON-COMPULSORY
 
-//Pitäs onnistua, alialueet löytyy regions_umap.at(id).subregions (usetistä)
+/**
+ * @brief Datastructures::all_subregions_of_region
+ * @param id
+ * @return if no region found with given param.return NO_REGION in a vector,
+ * if region has no subregions returns an empty vector
+ * otherwise return a vector holding all regionid:s to subregions in non-spesific order
+ */
 
 std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 {
-
     vector<RegionID> re_vector;
 
-    //Jos id:llä ei ole aluetta palautetaan vektori jonka alkion NO_REGION
     if (regions_umap_.count(id) == 0){
         re_vector.push_back(NO_REGION);
         return re_vector;
     }
-    //Jos annettun alueeseen ei kuulu muita alueita palautetaan tyhjä vektori
-    if (regions_umap_.at(id).subregions.empty())
-        return re_vector;   //pitäs olla tyhjjä
 
-    //re_vector.push_back(id);
+    if (regions_umap_.at(id).subregions.empty())
+        return re_vector;
+
     recursive_subregions_to_regions(id, re_vector);
     return re_vector;
 
@@ -490,7 +493,12 @@ std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 
 
 
-//Apufunkku yllä olevalle
+/**
+ * @brief Datastructures::recursive_subregions_to_regions recursively goes through every region´s
+ * subregion adding them to a vector
+ * @param id, integer (RegionID see .hh file), individual id for region
+ * @param re_vector, referenced vector from calling function holdin RegionID:s
+ */
 void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
 
@@ -553,8 +561,8 @@ void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<
 
 /**
  * @brief Datastructures::remove_station, if station exists removes it from all datastructures where it´s found
- * @param id, string (StationId, kts .hh), aseman yksilöivä tunnus
- * @return true jos poisto onnistuu, muutoin fal
+ * @param id, string (StationId, kts .hh), unique id for station
+ * @return true if removal accomplished otherwise false
  */
 bool Datastructures::remove_station(StationID id)
 {
@@ -596,12 +604,44 @@ bool Datastructures::remove_station(StationID id)
 
 
 
-
-std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
+//etäisyysjärjestyksessä kolme annettuakoordinaattia lähinnä olevaa asemaa.
+//Jos ei ole kolmea asemaa (olemassa tietorakenteessa), palautetaan ne mitä on
+std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("stations_closest_to()");
+    //jos sorttais station_vectoria coord_as_key_mapin avulla lambdalla ja lisäis max 3 ekaa paluuvektoriin ja muuttaa 2 booleania falseksi
+
+    vector <StationID> re_vector;
+    auto distance_between = [xy, this](auto& a, auto& b)
+    {
+        int given_x = xy.x;
+        int given_y = xy.y;
+        int first_x = stations_umap_.at(a).coordinates.x;
+        int first_y = stations_umap_.at(a).coordinates.y;
+        int sec_x = stations_umap_.at(b).coordinates.x;
+        int sec_y = stations_umap_.at(b).coordinates.y;
+        int first_distance = sqrt( pow(given_x - first_x, 2) +
+                                   pow(given_y - first_y, 2) );
+        int second_distance = sqrt( pow(given_x - sec_x, 2) +
+                                    pow(given_y - sec_y, 2) );
+
+        if (first_distance == second_distance)          //lyhennetty
+            return first_y < sec_y;
+        if (first_distance < second_distance)
+            return true;
+        return false;
+
+
+
+        ;};
+
+    sort(station_vector_.begin(), station_vector_.end(), distance_between);
+    stations_alphabetically_ = false;
+    stations_distance_sorted_ = false;
+    for (int max_three = 0; max_three < 3; max_three++){
+        re_vector.push_back(station_vector_[max_three]);
+    }
+    return re_vector;
+
 }
 
 
