@@ -13,7 +13,7 @@ using namespace std;
  * @brief Create a Node object
  * 
  * @param loc  The location of the node
- * @return Node*  A pointer to the node that is created. If the node cannot be created, return nullptr
+ * @return Node*  A pointer to the node that is created. If the node already exists, return a pointer to the existing node
  */
 Node* createNode  (std::pair<int, int> loc, std::map<std::string, Node*> paths) {
     std::cout << "createNode not implemented" << std::endl;
