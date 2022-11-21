@@ -614,43 +614,37 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
  */
 RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
 {
+    //outoa, palauttaa id1:n joissain
+
     if (regions_umap_.count(id1) == 0 || regions_umap_.count(id2) == 0)
         return NO_REGION;
 
     set <RegionID> id1_parents;
-   // set <RegionID> id2_parents;
     recursive_parentregions(id1, id1_parents);
     return recursive_parentregions(id2, id1_parents);
-
-    /*
-    for (auto& value : id1_parents){
-        if ( id2_parents.count(value) == 1){
-            return value;
-        }
-    }
-*/
-    return NO_REGION;
 
 }
 
 
 
+
 /**
- * @brief Datastructures::recursive_all_parentregions
+ * @brief Datastructures::recursive_parentregions adds parents in one datastructure,
+ * if insertion fails the first common parent has been found
  * @param id, unsigned long long int, unique id for each region
  * @param parents, referenced set with regionid:s
+ * @return regionid of common parent if such found toherwise NO_REGION
  */
 RegionID Datastructures::recursive_parentregions(const RegionID &id, set<RegionID> &parents)
 {
     RegionID parent = regions_umap_.at(id).parent;
     if ( parent == NO_REGION)
-        return NO_REGION;                       //jos ei ole parenttia niin yhteistä ei ole löytynyt
-    if ( parents.insert(parent).second)         //jos lisäys onnistuu, ei se ole vielä yhteinen
+        return NO_REGION;
+    if ( parents.insert(parent).second)
         recursive_parentregions(parent, parents);
 
-
-    return parent;  //jos lisäys settiin  ei onnistu, on kyseinen jos setissä
-
+    return id;
+    //ei vittu mitä tän pitää palauttaa, melkein toimii
 }
 
 

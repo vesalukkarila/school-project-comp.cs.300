@@ -216,8 +216,8 @@ public:
     // Short rationale for estimate: single for-loops multiple times
     bool remove_station(StationID id);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: recursive called twice
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
 
