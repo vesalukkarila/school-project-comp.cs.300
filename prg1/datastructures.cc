@@ -468,22 +468,28 @@ void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionI
 
 //Pitäs onnistua, alialueet löytyy regions_umap.at(id).subregions (usetistä)
 
-std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID /*id*/)
+std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 {
-    /*
+
     vector<RegionID> re_vector;
+
+    //Jos id:llä ei ole aluetta palautetaan vektori jonka alkion NO_REGION
+    if (regions_umap_.count(id) == 0){
+        re_vector.push_back(NO_REGION);
+        return re_vector;
+    }
+    //Jos annettun alueeseen ei kuulu muita alueita palautetaan tyhjä vektori
+    if (regions_umap_.at(id).subregions.empty())
+        return re_vector;   //pitäs olla tyhjjä
+
+    //re_vector.push_back(id);
     recursive_subregions_to_regions(id, re_vector);
     return re_vector;
-    */
 
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("all_subregions_of_region()");
 }
 
 
-/*
- *
+
 //Apufunkku yllä olevalle
 void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
@@ -495,19 +501,21 @@ void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<
         recursive_subregions_to_regions(value, re_vector);
     }
     return;
-
-
-
 }
+
+/*
+    struct region_struct{
+        Name name;
+        vector<Coord> coordinates_vector;
+
+        //3 viimeiseen vapaaehtoiseen liittyvät
+        unordered_set <RegionID> subregions;
+        unordered_set <StationID> stations;
+        RegionID parent;
+    };
 
 */
 
-std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
-{
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("stations_closest_to()");
-}
 
 
 /*
@@ -542,13 +550,20 @@ std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
                      unordered_set <RegionID> all_subregions_;
           unordered_set <StationID> all_stations_for_regions_;    X  pitää poistaa
 */
-//Ihan niiinku station in regionissa ois väärä paluuarvo jossain vaihtoehdossa
+
+/**
+ * @brief Datastructures::remove_station, if station exists removes it from all datastructures where it´s found
+ * @param id, string (StationId, kts .hh), aseman yksilöivä tunnus
+ * @return true jos poisto onnistuu, muutoin fal
+ */
 bool Datastructures::remove_station(StationID id)
 {
     if (stations_umap_.count(id) == 0)
         return false;
-    stations_umap_.erase(id);   //päätietorakenne, stations_umapista
-    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){    //station_vectorista, voi tulla iteraattori invalidoitumista(?)
+    //Asemien päätietorakenne
+    stations_umap_.erase(id);
+    //Poisto vektorista jossa kaikki asemat
+    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){
         if (*it == id){
 
             station_vector_.erase(it);
@@ -556,20 +571,19 @@ bool Datastructures::remove_station(StationID id)
         }
     }
 
-    //poisto coordaskeymapista
+    // Poisto koordinaattien mukaan järjestetystä tietorakenteesta
     for (auto& [k,v] : coord_as_key_map_){
         if (v == id){
             coord_as_key_map_.erase(k);
             break;
         }
-
     }
 
-    //Jos löytyy tietorakenteesta johon on listattu kaikki alueille alistetut asemat..
+    //Jos löytyy tietorakenteesta johon on listattu kaikille alueille alistetut asemat..
     if (all_stations_for_regions_.count(id) == 1){
         //..poistetaan..
         all_stations_for_regions_.erase(id);
-        //..jolloin löytyy myös jonkin region tietorakenteen hyötykuormasta.stations
+        //..jolloin löytyy myös jonkin region tietorakenteen hyötykuormasta
         for ( auto& [k,v] : regions_umap_){
             if ( v.stations.count(id) == 1){
                 v.stations.erase(id);
@@ -578,6 +592,16 @@ bool Datastructures::remove_station(StationID id)
         }
     }
     return true;
+}
+
+
+
+
+std::vector<StationID> Datastructures::stations_closest_to(Coord /*xy*/)
+{
+    // Replace the line below with your implementation
+    // Also uncomment parameters ( /* param */ -> param )
+    throw NotImplemented("stations_closest_to()");
 }
 
 

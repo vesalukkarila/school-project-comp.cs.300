@@ -212,8 +212,8 @@ public:
     // Short rationale for estimate:
     std::vector<StationID> stations_closest_to(Coord xy);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: single for-loops multiple times
     bool remove_station(StationID id);
 
     // Estimate of performance:
