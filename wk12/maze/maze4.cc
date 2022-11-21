@@ -14,6 +14,7 @@ using namespace std;
  * @brief Find the shortest path from startNode to endNode using Djikstra's algorithm, where all path distances are 1
  * @param startNode  The node to start the search from
  * @param endNode  The node to end the search at
+ * @param path  The path from startNode to endNode. If no path is found or if startNode is the same as endNode, path should be empty
  * @return bool True if a path was found, false otherwise
  */
 
