@@ -27,10 +27,25 @@ Node* createNode  (std::pair<int, int> loc, std::map<std::string, Node*> paths) 
     Node* t = new Node;
     t->x = loc.first;
     t->y = loc.second;
-    t->above = nullptr; //nullptr????
-    t->below = nullptr;
-    t->right = nullptr;
-    t->left = nullptr;
+    if(paths.count(ABOVE) == 1)
+        t->above = paths.at(ABOVE);
+    else
+        t->above = nullptr;
+
+    if(paths.count(BELOW) == 1)
+        t->below = paths.at(BELOW);
+    else
+        t->below = nullptr;
+
+    if(paths.count(RIGHT) == 1)
+        t->right = paths.at(RIGHT);
+    else
+        t->right = nullptr;
+
+    if(paths.count(LEFT) == 1)
+        t->left = paths.at(LEFT);
+    else
+        t->left = nullptr;
 
   //  Node* t = &uusi;            //tän ois ehkä voinu tehdä suoraan Node* paikallisosoitin = new Node{loc.first, loc.second, jne}
     vektori.push_back(t);
