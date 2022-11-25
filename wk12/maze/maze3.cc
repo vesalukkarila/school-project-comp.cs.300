@@ -16,6 +16,9 @@ using namespace std;
  * @param toNode  The node to connect to
  */
 void connectNodes(Node& node1, Node& node2) {
-    std::cout << "connectNodes not implemented" << std::endl;
+
     // Student code here to connect the nodes together
+
+    node1.to = &node2;
+    node2.from = &node1;
 }
