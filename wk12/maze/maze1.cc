@@ -9,7 +9,6 @@ using namespace std;
 // Remember to implement your own container here or in another cc file to store the nodes in the maze
 // If you define it elsewhere, remember to make sure it's accessible by this file as well.
 
-vector<Node*> vektori;
 
 /**
  * @brief Create a Node object
@@ -47,7 +46,10 @@ Node* createNode  (std::pair<int, int> loc, std::map<std::string, Node*> paths) 
     else
         t->left = nullptr;
 
-  //  Node* t = &uusi;            //tän ois ehkä voinu tehdä suoraan Node* paikallisosoitin = new Node{loc.first, loc.second, jne}
+    t->from = nullptr;
+    t->to = nullptr;
+
+  //  Node* t = &uusi;            //tän o is ehkä voinu tehdä suoraan Node* paikallisosoitin = new Node{loc.first, loc.second, jne}
     vektori.push_back(t);
 
 

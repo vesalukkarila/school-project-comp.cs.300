@@ -20,6 +20,7 @@ const int INVALID_TEST_CASE = 3;
 const int NOT_FOUND = -1;
 
 
+
 // STUDENT TODO: Add your own struct here to represent a node with a location and knowledge of its neighbours
 struct Node
 {
@@ -29,7 +30,11 @@ struct Node
     Node* below;
     Node* left;
     Node* right;
+    Node* from;
+    Node* to;
 };
+
+inline std::vector<Node*> vektori;
 
 // STUDENT TODO: Implement these functions in maze1.cc, maze2.cc, maze3.cc, and maze4.cc
 Node *createNode(std::pair<int, int> loc, std::map<std::string, Node*> paths);
