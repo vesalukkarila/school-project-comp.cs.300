@@ -19,6 +19,11 @@ void connectNodes(Node& node1, Node& node2) {
 
     // Student code here to connect the nodes together
 
-    node1.to = &node2;
-    node2.from = &node1;
+    if ((node1.x == node2.x || node1.x == node2.x +1 || node1.x == node2.x -1)
+            &&
+            (node1.y == node2.y || node1.y == node2.y +1 || node1.y == node2.y -1) ){
+
+        node1.to = &node2;
+        node2.from = &node1;
+    }
 }
