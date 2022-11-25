@@ -2,7 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include "maze.hh"
-#include "maze1.cc"
+//#include "maze1.cc"
 using namespace std;
 
 // Remember to implement your own container here or in another cc file to store the nodes in the maze
