@@ -23,7 +23,12 @@ const int NOT_FOUND = -1;
 // STUDENT TODO: Add your own struct here to represent a node with a location and knowledge of its neighbours
 struct Node
 {
-
+    int x;
+    int y;
+    Node* above;
+    Node* below;
+    Node* left;
+    Node* right;
 };
 
 // STUDENT TODO: Implement these functions in maze1.cc, maze2.cc, maze3.cc, and maze4.cc

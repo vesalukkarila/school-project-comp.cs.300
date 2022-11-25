@@ -9,6 +9,8 @@ using namespace std;
 // Remember to implement your own container here or in another cc file to store the nodes in the maze
 // If you define it elsewhere, remember to make sure it's accessible by this file as well.
 
+vector<Node*> vektori;
+
 /**
  * @brief Create a Node object
  * 
@@ -16,6 +18,23 @@ using namespace std;
  * @return Node*  A pointer to the node that is created. If the node already exists, return a pointer to the existing node
  */
 Node* createNode  (std::pair<int, int> loc, std::map<std::string, Node*> paths) {
-    std::cout << "createNode not implemented" << std::endl;
-    return NULL;
+    //If attempting to create a node that already exists, you must simply return the existing node.
+    for (auto alkio : vektori){
+        if ( alkio->x == loc.first && alkio->y == loc.second)
+            return alkio;
+    }
+
+    Node* t = new Node;
+    t->x = loc.first;
+    t->y = loc.second;
+    t->above = nullptr; //nullptr????
+    t->below = nullptr;
+    t->right = nullptr;
+    t->left = nullptr;
+
+  //  Node* t = &uusi;            //tän ois ehkä voinu tehdä suoraan Node* paikallisosoitin = new Node{loc.first, loc.second, jne}
+    vektori.push_back(t);
+
+
+    return t;
 }
