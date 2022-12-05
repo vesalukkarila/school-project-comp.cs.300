@@ -1,12 +1,14 @@
 // Datastructures.cc
-
+//
+// Student name:
+// Student email:
+// Student number:
 
 #include "datastructures.hh"
 
 #include <random>
 
 #include <cmath>
-
 
 std::minstd_rand rand_engine; // Reasonably quick pseudo-random generator
 
@@ -21,611 +23,630 @@ Type random_in_range(Type start, Type end)
     return static_cast<Type>(start+num);
 }
 
-// Modify the code below to implement the functionality of the class.
-// Also remove comments from the parameter names when you implement
-// an operation (Commenting out parameter name prevents compiler from
-// warning about unused parameters on operations you haven't yet implemented.)
 
-Datastructures::Datastructures()
+/**
+ * @brief Datastructures::Datastructures shows attributes
+ */
+Datastructures::Datastructures():
+stations_umap_(), station_vector_(), coord_as_key_map_(),
+stations_alphabetically_(false), stations_distance_sorted_(false),
+regions_umap_(), region_vector_(),
+all_subregions_(), all_stations_for_regions_()
+
 {
 
 }
 
+
+
+/**
+ * @brief Datastructures::~Datastructures no implemetation here
+ */
 Datastructures::~Datastructures()
 {
-
+    // Write any cleanup you need here
 }
 
+
+
 /**
-* @brief Datastructures::station_count count all stations
-* @return size of map
-*/
+ * @brief Datastructures::station_count counts the number of stations
+ * @return number of stations
+ */
 unsigned int Datastructures::station_count()
-{
-    // Return count of maps keys
-    return station.size();
+{    
+    return stations_umap_.size();
 }
 
+
+
 /**
- * @brief Datastructures::clear_all clears both maps
+ * @brief Datastructures::clear_all clears all 7 datastructures used
  */
 void Datastructures::clear_all()
 {
-    // Clears both maps from all values
-    station.clear();
-    region.clear();
-    station_names.clear();
+    stations_umap_.clear();
+    station_vector_.clear();
+    coord_as_key_map_.clear();
+
+    regions_umap_.clear();
+    region_vector_.clear();
+
+    all_subregions_.clear();
+    all_stations_for_regions_.clear();
+
 }
 
+
+
+
 /**
- * @brief Datastructures::all_stations gets every station and adds to vector
- * @return vector with station ids
+ * @brief Datastructures::all_stations this function´s work has been done in add station
+ * @return all station-id:s in a unsorted vector
  */
 std::vector<StationID> Datastructures::all_stations()
 {
-    // For loop to get every key in the map and then it returns them
-    std::vector<StationID> stations;
-    std::transform(station.begin(), station.end(), std::back_inserter(stations), [](auto &station){return station.first;});
-    // Returns all station ids
-    return stations;
+    return station_vector_;
 }
 
+
+
+
 /**
- * @brief Datastructures::add_station adds new station to map
- * @param id stations id
- * @param name stations name
- * @param xy stations coordinates
- * @return true if succeed, otherwise false
+ * @brief Datastructures::add_station adds data about stations in necessary datastructures
+ * @param id, string, id of the station, unique for each station
+ * @param name, string, name of the station, not-unique
+ * @param xy, type Coord (see .hh file), station coordinates
+ * @return true if adding station to datastructure accomplished, otherwise false
  */
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
-    // First check if it already exist
-    if (station.find(id) != station.end()){
-        return false;
+    station_struct value = {name, xy, {}, NO_REGION};
+    if ( stations_umap_.insert({id, value}).second ){           // päätietorakenne asemille
+        station_vector_.push_back(id);                          // tietorakenne palautuksia varten, kaikki asemat
+        coord_as_key_map_.insert({xy, id});                     // find_station_with_coordia varten
+        stations_alphabetically_ = false;                       // stations_alphabetically varten kirjanpito
+        stations_distance_sorted_ = false;                      // stations_distance_increasing varten kirjanpito
+        return true;
     }
-
-    // Mpas data
-    station[id].station_name = name;
-    station[id].coord = xy;
-
-    // Vectors data
-    station_names.push_back(std::make_pair(name, id));
-
-    return true;
+    return false;
 }
 
+
+
 /**
- * @brief Datastructures::get_station_name takes stations name
- * @param id is stations id
- * @return name of wanted station
+ * @brief Datastructures::get_station_name searches for station by id and its name
+ * @param id, string, id of the station, unique id of the station
+ * @return string, stations name if station is found, otherwise NO_NAME(see .hh file)
  */
 Name Datastructures::get_station_name(StationID id)
 {
-    // Check if it is in map
-    if (station.find(id) != station.end()){
-        return station[id].station_name;
-    }
-    // Else return NO_NAME
+    auto search = stations_umap_.find(id);
+    if (search != stations_umap_.end())
+        return search->second.name;
     return NO_NAME;
 }
 
+
+
 /**
- * @brief Datastructures::get_station_coordinates gets wanted stations coordinates
- * @param id stations id
- * @return coordinates of wanted station
+ * @brief Datastructures::get_station_coordinates searches for station by id and its coordinates
+ * @param id, string, id of the station, unique for each station
+ * @return Coord (see .hh file), coordinates for station if station is found, otherwise NO_COORD(see .hh file)
  */
 Coord Datastructures::get_station_coordinates(StationID id)
 {
-    // Check if it is in map
-    if (station.find(id) != station.end()){
-        return station[id].coord;
-    }
-    // Else return NO_COORD
+    auto search = stations_umap_.find(id);
+    if (search != stations_umap_.end())
+        return search->second.coordinates;
     return NO_COORD;
 }
 
+
+
 /**
- * @brief Datastructures::stations_alphabetically takes every station and puts them to alphabetical order
- * @return all station ids in order
+ * @brief Datastructures::stations_alphabetically sorts stations in alphabetical order by their names
+ * @return all station-id:s in a vector sorted by their names
  */
 std::vector<StationID> Datastructures::stations_alphabetically()
 {
-    // sort vector of station names
-    std::sort(station_names.begin(), station_names.end());
-    // Add ids to new vector
-    std::vector<StationID> ids;
+    if (stations_alphabetically_ == false){
+        auto sort_vector = [this] (auto& a, auto& b )
+        {return stations_umap_.at(a).name < stations_umap_.at(b).name;};
 
-    for (auto const& map:station_names){
-        ids.push_back(map.second);
+        sort(station_vector_.begin(), station_vector_.end(), sort_vector);
+        stations_alphabetically_ = true;
+        stations_distance_sorted_ = false;
     }
 
-    // Return vector
-    return ids;
+    return station_vector_;
 }
 
+
+
+
 /**
- * @brief Datastructures::stations_distance_increasing takes every station and puts them to coordinate order
- * @return all station ids in order
+ * @brief Datastructures::stations_distance_increasing copies station-id:s from map to a vector,
+ * stations are allready in ascending order by their coordinates in a map
+ * @return all station-id:s in a vector sorted in ascending order byt coordinates
  */
 std::vector<StationID> Datastructures::stations_distance_increasing()
 {
-    // Make unordered map where coordinates are keys
-    std::vector<std::pair<float, StationID>> distance_vec;
 
-    // Add all values to new map from station map
-    for (auto const&map: station){
-        float x_value = map.second.coord.x;
-        float y_value = map.second.coord.y;
+    if (stations_distance_sorted_ == false) {
 
-        float distance = sqrt((x_value*x_value)+(y_value*y_value));
-        distance_vec.push_back(std::make_pair(distance, map.first));
+        auto sort_vector = [this] (auto& a, auto& b )
+        {   int first_x = stations_umap_.at(a).coordinates.x;
+            int first_y = stations_umap_.at(a).coordinates.y;
+            int second_x = stations_umap_.at(b).coordinates.x;
+            int second_y = stations_umap_.at(b).coordinates.y;
+            int calcute_first = sqrt ( pow(first_x,2) + pow(first_y, 2));
+            int calculate_second = sqrt ( pow(second_x,2) + pow(second_y, 2) );
+
+            if ( calcute_first == calculate_second ){
+                if (first_y < second_y)
+                    return true;
+                else
+                    return false;
+            }
+            if ( calcute_first < calculate_second)
+                return true;
+            else
+                return false; ; };
+
+
+        sort(station_vector_.begin(), station_vector_.end(), sort_vector);
+        stations_alphabetically_ = false;
+        stations_distance_sorted_ = true;
     }
 
-    // Sort vector
-    std::sort(distance_vec.begin(), distance_vec.end());
-
-    // Make new vector with only ids
-    std::vector<StationID> ids;
-
-    // Add ids to new vector
-    for (auto const& map:distance_vec){
-        ids.push_back(map.second);
-    }
-
-    // Then return vector
-    return ids;
+    return station_vector_;
 
 }
 
+
+
+
+
 /**
- * @brief Datastructures::find_station_with_coord find station with given coordinate
- * @param xy coordinates
- * @return station id if found
+ * @brief Datastructures::find_station_with_coord checks if station is found with given coordinates
+ * @param xy, Coord (see .hh file), coordinates of the searched station
+ * @return string, stations id if station found with coordinates, otherwise NO_STATION(see .hh file)
  */
 StationID Datastructures::find_station_with_coord(Coord xy)
 {
-
-    // Lets go trough coords vector
-    // If values are same, return station i
-
-    auto it = std::find_if(station.begin(), station.end(), [&xy](const std::pair<StationID, station_information> &value) ->bool {return value.second.coord == xy;});
-
-    if (it != station.end()){
-        return it->first;
-    }
-
-    // Else return NO_STATION
+    auto search = coord_as_key_map_.find(xy);
+    if (search != coord_as_key_map_.end())
+        return search->second;
     return NO_STATION;
 }
+
+
+
 /**
- * @brief Datastructures::change_station_coord changes stations coordinates
- * @param id stations id
- * @param newcoord stations new coordinates
- * @return true if succesful, otherwise false
+ * @brief Datastructures::change_station_coord changes station coordinates in related datatstructures
+ * if station exists
+ * @param id, string, station we are looking for
+ * @param newcoord, new coordinates for the station
+ * @return true if station found otherwise false
  */
 bool Datastructures::change_station_coord(StationID id, Coord newcoord)
 {
-    // First check if station even exist
-    auto it = station.find(id);
-    if (it != station.end()){
-        // Then change value
-        it->second.coord = newcoord;
+
+    if (auto it = stations_umap_.find(id); it != stations_umap_.end()){
+        Coord old_coordinate = it->second.coordinates;
+        it->second.coordinates = newcoord;
+        coord_as_key_map_.erase(old_coordinate);
+        coord_as_key_map_.insert({newcoord, id});
+        stations_distance_sorted_ = false;
+
         return true;
     }
-    // Return false if not found
     return false;
 }
 
+
+
 /**
- * @brief Datastructures::add_departure adds new departure to station
- * @param stationid stations id
- * @param trainid trains id
- * @param time time when train arrives
- * @return true if succesful, otherwise false
+ * @brief Datastructures::add_departure adds train departure-info for given station
+ * @param stationid, string, unique for each station
+ * @param trainid, string (see .hh file), identification for the train
+ * @param time, unsigned short int (see .hh file), departure time of the train
+ * @return true if station exists otherwise false
  */
 bool Datastructures::add_departure(StationID stationid, TrainID trainid, Time time)
 {
-    // Check if station exist
-    if (station.count(stationid)){
-        // Then check if train is added
-        for (unsigned long int i = 0; i < station.at(stationid).departures.size(); i++){
-            if(station[stationid].departures[i].first == time){
-                // Also check if time is same
-                if(station[stationid].departures[i].second == trainid){
-                    // Then return false
-                    return false;
-                }
-            }
-        }
-        // If departure is not there yet, let's add it
-        station[stationid].departures.push_back(std::make_pair(time, trainid));
 
-        // And then return true
-        return true;
 
+    if (stations_umap_.count(stationid) == 1){
+        return stations_umap_.at(stationid).trains_set.insert({time, trainid}).second;
     }
-    // Otherwise return false
     return false;
 }
 
+
+
 /**
- * @brief Datastructures::remove_departure removes old departure
- * @param stationid wanted station
- * @param trainid wanted train
- * @param time wanted time
- * @return true if succesful, otherwise false
+ * @brief Datastructures::remove_departure removes train departure-info if such found
+ * @param stationid, string (see .hh file), unique for each station
+ * @param trainid, string (see .hh file), identification for the train
+ * @param time, unsigned short int (see .hh file), departure time of the train
+ * @return true if given station and departure-info found otherwise false
  */
 bool Datastructures::remove_departure(StationID stationid, TrainID trainid, Time time)
 {
-    // Check if station exist
-    if (station.count(stationid)){
-        // then check if trainid exist
-        for (unsigned long int i = 0; i < station.at(stationid).departures.size(); i++){
-            if(station.at(stationid).departures.at(i).first == time){
-                // Also check if time is same
-                if(station.at(stationid).departures.at(i).second == trainid){
-                    // Then remove value from vector
-                    station.at(stationid).departures.erase(station.at(stationid).departures.begin()+i);
-
-                    // And return true
-                    return true;
-                }
-            }
-        }
+    if (stations_umap_.count(stationid) == 1
+            && stations_umap_.at(stationid).trains_set.count({time, trainid}) == 1){
+        stations_umap_.at(stationid).trains_set.erase({time, trainid});
+        return true;
     }
-    // Otherwise return false
     return false;
 }
 
+
+
 /**
- * @brief Datastructures::station_departures_after gets every departure after given time
- * @param stationid wanted station
- * @param time other departures after this time
- * @return vector with all departures after time
+ * @brief Datastructures::station_departures_after lists all departures from given station at or after given time
+ * @param stationid, string (see .hh file), unique for each station
+ * @param time, unsigned short int (see .hh file), departure time of the train
+ * @return train-departure info in a vector as pairs, sorted by departure time
  */
 std::vector<std::pair<Time, TrainID>> Datastructures::station_departures_after(StationID stationid, Time time)
 {
-    // Vector for all departures after given time
-    std::vector<std::pair<Time, TrainID>> departures_after;
+    vector<std::pair<Time, TrainID>> re_vector;
 
-    // First check if station exist
-    if (station.count(stationid)){
-        // Station exist so lets add every departure after given time
-        // First go throught every every departure and add only them with higher time to new vector
-        for (unsigned long int i = 0; i < station[stationid].departures.size(); i++){
-            // Check if time is higher or equal than given time
-            if (station[stationid].departures[i].first >= time){
-                // Then add it to new vector
-                Time time2 = station[stationid].departures[i].first;
-                StationID trainid = station[stationid].departures[i].second;
-                departures_after.push_back(std::make_pair(time2, trainid));
-            }
+    if (stations_umap_.count(stationid) != 1)
+        re_vector.push_back({NO_TIME, NO_TRAIN});    
+
+    else {
+        for (auto& [departure_time, train]: stations_umap_.at(stationid).trains_set){
+            if (departure_time >= time)
+                re_vector.push_back({departure_time, train});
         }
-        // Return vector in sorted order
-        sort(departures_after.begin(), departures_after.end());
-
-        return departures_after;
     }
-
-    // Otherwise return {NO_TIME, NO_TRAIN}
-    departures_after.push_back(std::make_pair(NO_TIME, NO_TRAIN));
-    return departures_after;
+    return re_vector;
 }
 
+
+
 /**
- * @brief Datastructures::add_region adds new region
- * @param id id of region
- * @param name of region
- * @param coords of region
- * @return true if succesful, false otherwise
+ * @brief Datastructures::add_region adds a region to related datastructures if one doesn´t exist before
+ * @param id, integer (see .hh file), unique for each region
+ * @param name, string (see .hh file), name of the region
+ * @param coords, Coord (see .hh file), region´s coordinates in a vector
+ * @return true inserting accomplished otherwise false
  */
 bool Datastructures::add_region(RegionID id, const Name &name, std::vector<Coord> coords)
 {
-    // First check if region already exist
-    if (region.count(id)){
-        return false;
+    region_struct value = {name, coords, {}, {}, NO_REGION};
+    if ( regions_umap_.insert({id, value}).second ){
+        region_vector_.push_back(id);
+
+        return true;
     }
-    // Otherwise add new region
-
-    // If doesnt contain then add new region and return true
-    // Set parent id empty because it isn't given yet
-    region_information new_information = {name,coords,NO_REGION};
-    region.insert({id, new_information});
-
-    return true;
+    return false;
 }
 
+
+
 /**
- * @brief Datastructures::all_regions gets every region
- * @return every region
+ * @brief Datastructures::all_regions work has been done in add_region
+ * @return unsorted vector full of regionid´s
  */
 std::vector<RegionID> Datastructures::all_regions()
 {
-    // Empty vector for all regions
-    std::vector<RegionID> ids;
-
-    // Add evey region id to vector
-    for (auto&map:region){
-        ids.push_back(map.first);
-    }
-
-    // Return vector
-    return ids;
+    return region_vector_;
 }
 
+
+
 /**
- * @brief Datastructures::get_region_name gets name of region
- * @param id of region
- * @return name of wanted region
+ * @brief Datastructures::get_region_name checks if region exists returns its name
+ * @param id, integer (see .hh file), unique for each region
+ * @return regions name if region found by its id otherwise NO_NAME
  */
 Name Datastructures::get_region_name(RegionID id)
 {
-    // First check if id exist
-    if (region.count(id)){
-        // then return region name
-        return (region.at(id).region_name);
-    }
-    // Else return NO_NAME
+    auto search = regions_umap_.find(id);
+    if (search != regions_umap_.end())
+        return search->second.name;
     return NO_NAME;
 }
 
+
+
 /**
- * @brief Datastructures::get_region_coords gets coordinates of region
- * @param id of region
- * @return vector of coordinates
+ * @brief Datastructures::get_region_coords checks if regions exists and returns its coordinates
+ * @param id, integer (see .hh file), unique for each region
+ * @return regions coordinatesvector if region found otherwise NO_COORD in a vector
  */
 std::vector<Coord> Datastructures::get_region_coords(RegionID id)
 {
-    // First check if id exist
-    if (region.count(id)){
-        // then return coordinates
-        return (region.at(id).region_coords);
-    }
-    // Else return vector with one element NO_COORD
-    // Make empty vector with value
-    std::vector<Coord>no_coord = {NO_COORD};
-
-    // Return it
-    return no_coord;
+    auto search = regions_umap_.find(id);
+    if (search != regions_umap_.end())
+        return search->second.coordinates_vector;
+    vector<Coord> v = {NO_COORD};
+    return v;
 }
 
+
+
 /**
- * @brief Datastructures::add_subregion_to_region adds poarenit to region
- * @param id regions id
- * @param parentid is regions parent regions id
- * @return true or false
+ * @brief Datastructures::add_subregion_to_region add info about parent-child relationship to related datastructures
+ * @param id, integer (see .hh file), unique for each region, subregion´s id
+ * @param parentid, integer (see .hh file), unique for each region, parentregion´s id
+ * @return true if both child and parent exist and if child has no parent allready, otherwise false
  */
 bool Datastructures::add_subregion_to_region(RegionID id, RegionID parentid)
 {
-    // First check if id is in regions
-    if(region.count(id)){
-        // then check if regions parent id is empty
-        if (region.at(id).parent_id == NO_REGION){
-            // Add parent id
-            region.at(id).parent_id = parentid;
-            return true;
-        }
-    }
+    if (regions_umap_.count(id) == 0 || regions_umap_.count(parentid) == NO_REGION)
+        return false;
 
-    // Otherwise return false
+    if (all_subregions_.insert(id).second) {
+        regions_umap_.at(parentid).subregions.insert(id);
+        regions_umap_.at(id).parent = parentid;
+        return true;
+        }
+
     return false;
 }
 
+
+
 /**
- * @brief Datastructures::add_station_to_region adds station to region
- * @param id of station
- * @param parentid is id of region
- * @return true or false
+ * @brief Datastructures::add_station_to_region adds info about child-parent
+ *  relationship between station and region, station can belong to only 1 region
+ * @param id, stationid, string (see .hh file), unique for each station
+ * @param parentid, integer (see .hh file), unique for each region, parentregion´s id
+ * @return true if station and region exists and insertion accomplished, otherwise false
  */
 bool Datastructures::add_station_to_region(StationID id, RegionID parentid)
 {
-    // First check if region and station are found
-    if(region.count(parentid)){
-        if(station.count(id)){
-            // If contain region, return false
-            if (station[id].belongs_to != NO_REGION){
-                return false;
-            }
-            // Both region and station are found but station is not in other region
-            // So add it to region
-            station[id].belongs_to = parentid;
-            return true;
-        }
-    }
+    if (regions_umap_.count(parentid) == 0 || stations_umap_.count(id) == 0)
+        return false;
 
-    // Otherwise return false
+    if (all_stations_for_regions_.insert(id).second){
+        regions_umap_.at(parentid).stations.insert(id);
+        stations_umap_.at(id).parent_region = parentid;
+        return true;
+    }
     return false;
 }
 
+
+
+
 /**
- * @brief Datastructures::station_in_regions  gets all region where station id
- * @param id is stations id
- * @return vector of regions
+ * @brief Datastructures::station_in_regions lists all regions given station belongs to
+ * either directly or indirectly. Calls recursive_parent_regions()-function
+ * @param id, stationid, string (see .hh file), unique for each station
+ * @return a vector inholding each region´s regionid given station belong to if station found,
+ * if given station is no submitted to any region returns empty vector
+ * if station doesn´t exist returns NO_REGION as single element in a vector
  */
 std::vector<RegionID> Datastructures::station_in_regions(StationID id)
 {
-    // First make vector that contains region ids
-    std::vector<RegionID> ids;
+    vector<RegionID> re_vector;
 
-    // Then check if station exist
-    if (station.find(id) != station.end()){
-        // First check if is not in any region
-        if (station[id].belongs_to == NO_REGION){
-            // Return empty vector
-            return ids;
-        }
-        // Make first region as current
-        RegionID current_id = station[id].belongs_to;
-
-        // Then add values until no parent region
-        while(true){
-           // Add current value
-           ids.push_back(current_id);
-
-           // Then check if parentid is empty
-           // If isn't make it current value and if is break loop
-           if (region.at(current_id).parent_id == NO_REGION){
-               break;
-           }
-           current_id = region.at(current_id).parent_id;
-       }
-       // Then return vector
-        return ids;
+    if (stations_umap_.count(id) == 0 ) {
+        re_vector.push_back(NO_REGION);
+        return re_vector;
     }
 
-    // If doesn't exist return NO_REGION
-    return {NO_REGION};
+    if (all_stations_for_regions_.count(id) == 0)
+        return re_vector;
+
+
+    re_vector.push_back(stations_umap_.at(id).parent_region);
+    recursive_parent_regions(stations_umap_.at(id).parent_region, re_vector);
+
+    return re_vector;
 }
 
+
+
+
 /**
- * @brief Datastructures::all_subregions_of_region gets all subregions of region
- * @param id is regions id
- * @return vector of regions
+ * @brief Datastructures::recursive_parent_regions adds each parentregion to the reference-vector
+ * @param id, integer (see .hh file), unique for each region
+ * @param re_vector, reference-vector inholding regionid´s
  */
+void Datastructures::recursive_parent_regions(const RegionID &id, vector<RegionID> &re_vector)
+{
+    if (regions_umap_.at(id).parent == NO_REGION)
+        return;
+    re_vector.push_back(regions_umap_.at(id).parent);
+    recursive_parent_regions(regions_umap_.at(id).parent, re_vector);
+    return;
+}
+
+
+
+
+
+// NON-COMPULSORY
+
+/**
+ * @brief Datastructures::all_subregions_of_region
+ * @param id
+ * @return if no region found with given param.return NO_REGION in a vector,
+ * if region has no subregions returns an empty vector
+ * otherwise return a vector holding all regionid:s to subregions in non-spesific order
+ */
+
 std::vector<RegionID> Datastructures::all_subregions_of_region(RegionID id)
 {
-    // Make vector that contains all subregions
-    std::vector<RegionID> ids;
+    vector<RegionID> re_vector;
 
-
-    // Check if region exist
-    if (region.count(id)){
-        // Then let's add all subregions
-        // Go through every region and check if it some parent region is same as given region
-        for (auto&map:region){
-            RegionID current_id = map.second.parent_id;
-            while (true){
-                // Check if parent id is empty or same as region
-                // otherwise make parent id to current
-                if (current_id == id){
-                    ids.push_back(map.first);
-                }
-                else if(current_id == NO_REGION){
-                    break;
-                }
-                // If isn id or NO_REGION, then make parent id as current
-                current_id = region.at(current_id).parent_id;
-            }
-        }
-        return ids;
+    if (regions_umap_.count(id) == 0){
+        re_vector.push_back(NO_REGION);
+        return re_vector;
     }
 
-    // Region didn't exist so return NO_REGION
-    ids.push_back(NO_REGION);
-    return ids;
+    if (regions_umap_.at(id).subregions.empty())
+        return re_vector;
+
+    recursive_subregions_to_regions(id, re_vector);
+    return re_vector;
+
 }
 
+
+
 /**
- * @brief Datastructures::stations_closest_to gets station that is closest to coordinates
- * @param xy coordinates
- * @return 3 closest stations to coordinate
+ * @brief Datastructures::recursive_subregions_to_regions recursively goes through every region´s
+ * subregion adding them to a vector
+ * @param id, integer (RegionID see .hh file), individual id for region
+ * @param re_vector, referenced vector from calling function holdin RegionID:s
  */
-std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
+void Datastructures::recursive_subregions_to_regions(const RegionID &id, vector<RegionID> &re_vector)
 {
-    // Make vector for coordinates
-    std::vector<StationID> closest_stations;
 
-    // Vector thats key is the distance to station
-    std::vector<std::pair<float, StationID>> distance_ingreasing;
-
-    // Go through all stations
-    for (auto&map: station){
-        // Stations x and y values
-        int x = map.second.coord.x;
-        int y = map.second.coord.y;
-
-        // Given coords values are
-        int x2 = xy.x;
-        int y2 = xy.y;
-
-        // Add values to vector
-        float distance;
-
-        distance = sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2));
-        // Add values to vector
-        distance_ingreasing.push_back(std::make_pair(distance, map.first));
+    if (regions_umap_.at(id).subregions.empty())
+        return;
+    for (auto& value : regions_umap_.at(id).subregions){
+        re_vector.push_back(value);
+        recursive_subregions_to_regions(value, re_vector);
     }
-
-    // Order the vector
-    sort(distance_ingreasing.begin(), distance_ingreasing.end());
-
-    // Add values to new vector until its size is 3 or until stations are over
-    for(auto &map:distance_ingreasing){
-        closest_stations.push_back(map.second);
-        // check size
-        if (closest_stations.size() == 3){
-            return closest_stations;
-        }
-    }
-
-    // Return vector
-    return closest_stations;
+    return;
 }
 
+
+
+
 /**
- * @brief Datastructures::remove_station removes station
- * @param id is stations id
- * @return true or false
+ * @brief Datastructures::remove_station, if station exists removes it from all datastructures where it´s found
+ * @param id, string (StationId, kts .hh), unique id for station
+ * @return true if removal accomplished otherwise false
  */
 bool Datastructures::remove_station(StationID id)
 {
-    // First check if station exits
-    if (station.count(id)){
-        // Delete station from map
-        station.erase(id);
+    if (stations_umap_.count(id) == 0)
+        return false;
+    //Asemien päätietorakenne
+    stations_umap_.erase(id);
+    //Poisto vektorista jossa kaikki asemat
+    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){
+        if (*it == id){
 
-        // Also delete station from vector
-        unsigned long int i = 0;
-        while(i < station_names.size()){
-            if(station_names[i].second == id){
-                station_names.erase(station_names.begin()+i);
+            station_vector_.erase(it);
+            break;
+        }
+    }
+
+    // Poisto koordinaattien mukaan järjestetystä tietorakenteesta
+    for (auto& [k,v] : coord_as_key_map_){
+        if (v == id){
+            coord_as_key_map_.erase(k);
+            break;
+        }
+    }
+
+    //Jos löytyy tietorakenteesta johon on listattu kaikille alueille alistetut asemat..
+    if (all_stations_for_regions_.count(id) == 1){
+        //..poistetaan..
+        all_stations_for_regions_.erase(id);
+        //..jolloin löytyy myös jonkin region tietorakenteen hyötykuormasta
+        for ( auto& [k,v] : regions_umap_){
+            if ( v.stations.count(id) == 1){
+                v.stations.erase(id);
                 break;
             }
-            i++;
         }
-
-        // Then return true
-        return true;
     }
-    // Station didnt exist, return false
-    return false;
+    return true;
 }
 
+
+
+
 /**
- * @brief Datastructures::common_parent_of_regions gets common parent region of 2 regions
- * @param id1 first region id
- * @param id2 second region id
- * @return common parent
+ * @brief Datastructures::stations_closest_to finds three closest station to given coordinates
+ * @param xy, struct that inholds integers as x- and y-coordinates
+ * @return a vector with max three stationid:s sorted ascendically by distance from given coordinates
+ */
+std::vector<StationID> Datastructures::stations_closest_to(Coord xy)
+{
+    vector <StationID> re_vector;
+    auto distance_between = [&xy, this](auto& a, auto& b)
+    {
+        int given_x = xy.x;
+        int given_y = xy.y;
+        int first_x = stations_umap_.at(a).coordinates.x;
+        int first_y = stations_umap_.at(a).coordinates.y;
+        int sec_x = stations_umap_.at(b).coordinates.x;
+        int sec_y = stations_umap_.at(b).coordinates.y;
+        int first_distance = sqrt( pow(given_x - first_x, 2) +
+                                   pow(given_y - first_y, 2) );
+        int second_distance = sqrt( pow(given_x - sec_x, 2) +
+                                    pow(given_y - sec_y, 2) );
+
+        if (first_distance == second_distance)
+            return first_y < sec_y;
+        if (first_distance < second_distance)
+            return true;
+        return false;
+
+        ;};
+
+    sort(station_vector_.begin(), station_vector_.end(), distance_between);
+    stations_alphabetically_ = false;
+    stations_distance_sorted_ = false;
+    int counter = 0;
+    for (auto it = station_vector_.begin(); it != station_vector_.end(); ++it){
+        re_vector.push_back(*it);
+        ++counter;
+        if (counter >2)
+            break;
+    }
+
+    return re_vector;
+}
+
+
+
+
+/**
+ * @brief Datastructures::common_parent_of_regions finds the first common parent of given regions if such exists
+ * @param id1,  unsigned long long int, unique id for each region
+ * @param id2,  unsigned long long int, unique id for each region
+ * @return regionid to the first common parent if found, otherwise NO_REGION
  */
 RegionID Datastructures::common_parent_of_regions(RegionID id1, RegionID id2)
 {
-    // Go through first ids all parent ids and compare them to another ones
-    while (true){
-        RegionID first_current_id = region.at(id1).parent_id;
-        RegionID second_current_id = region.at(id2).parent_id;
+    //outoa, palauttaa id1:n joissain
 
-        // Compare first ones parent to second ones all parents
-        while(true){
-            // first check if first parent id is NO_REGION
-            if (first_current_id == NO_REGION){
-                return NO_REGION;
-            }
-            // Now compare first parent id to seconds all parent ids
-            else if (first_current_id == second_current_id){
-                return first_current_id;  
-            }
-            // If second is NO_REGION, then make first parent one step forward
-            // and reset rescond one
-            else if(second_current_id == NO_REGION){
-                // Make first ids value to next parent
-                // and second value back to original parent and it compares again
-                first_current_id = region.at(first_current_id).parent_id;
-                second_current_id = region.at(id2).parent_id;
-            }
-            // If not same and it isn't NO_REGION then make second one to next parent_id
-            else{
-                second_current_id = region.at(second_current_id).parent_id;
-            }
-        }  
-    }
+    if (regions_umap_.count(id1) == 0 || regions_umap_.count(id2) == 0)
+        return NO_REGION;
+
+    set <RegionID> id1_parents;
+    recursive_parentregions(id1, id1_parents);
+    return recursive_parentregions(id2, id1_parents);
+
 }
+
+
+
+
+/**
+ * @brief Datastructures::recursive_parentregions tries to add parent in referenced
+ * datastructure, if insertion fails the first common parent has been found
+ * @param id, unsigned long long int, unique id for each region
+ * @param parents, referenced set with regionid:s
+ * @return regionid of first common parent if such found toherwise NO_REGION
+ */
+RegionID Datastructures::recursive_parentregions(const RegionID &id, set<RegionID> &parents)
+{
+    RegionID parent = regions_umap_.at(id).parent;
+    if ( parent == NO_REGION)
+        return NO_REGION;
+    if ( parents.insert(parent).second)
+        return recursive_parentregions(parent, parents);
+
+    return parent;
+
+}
+
+
+
+
