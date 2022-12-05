@@ -1,8 +1,4 @@
 // Datastructures.hh
-//
-// Student name:
-// Student email:
-// Student number:
 
 #ifndef DATASTRUCTURES_HH
 #define DATASTRUCTURES_HH
@@ -14,29 +10,17 @@
 #include <limits>
 #include <functional>
 #include <exception>
-#include <unordered_map>
 #include <set>
 #include <unordered_set>
 #include <map>
+#include <unordered_map>
 
-using namespace std;
 // Types for IDs
-
-//Käytetään asemanyksilöivänä tunnisteena
 using StationID = std::string;
-
-//Käytetään asemien ja alueiden nimenä
-using Name = std::string;
-
-//Ei-negatiivinen kokonaisluku, jota käytetään alueen yksilöivänä tunnisteena
-using RegionID = unsigned long long int;
-
-// käytetään junan yksilöivänä tunnisteena
 using TrainID = std::string;
-
-//Kokonaisluku, joka kuvaa kellonaikaa muodossa HHMM.
+using RegionID = unsigned long long int;
+using Name = std::string;
 using Time = unsigned short int;
-
 
 // Return values for cases where required thing was not found
 StationID const NO_STATION = "---";
@@ -117,152 +101,120 @@ public:
     ~Datastructures();
 
     // Estimate of performance: O(1)
-    // Short rationale for estimate: size() is O(1)
+    // Short rationale for estimate: complexity of vector.size() is constant
     unsigned int station_count();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: clear() is linear in all containers
+    // Short rationale for estimate: complexity of clear() is linear
     void clear_all();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: Complexity grader won´t accept O(1), only returns one datastructure
+    // Short rationale for estimate: iterating throught loops is linear push_back() constant
     std::vector<StationID> all_stations();
 
-    // Estimate of performance: O(log n)
-    // Short rationale for estimate: map.insert the most expensive one
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: find() has linear complexity
     bool add_station(StationID id, Name const& name, Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.find(): worst case linear
+    // Short rationale for estimate: find() has linear complexity
     Name get_station_name(StationID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.find(): worst case linear
+    // Short rationale for estimate: find() has linear complexity
     Coord get_station_coordinates(StationID id);
 
     // We recommend you implement the operations below only after implementing the ones above
 
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: sort() algorithm is  O(nlogn) according to cpppreference
+    // Estimate of performance: O(n * log(n))
+    // Short rationale for estimate: sort() has linearithmic performance others linear
     std::vector<StationID> stations_alphabetically();
 
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: sort function is n log n according to cppreference
+    // Estimate of performance: O(n * log(n))
+    // Short rationale for estimate: sort() has linearithmic performance others linear
     std::vector<StationID> stations_distance_increasing();
 
-    // Estimate of performance: O(log n)
-    // Short rationale for estimate: map.find() is logarithmic in the size of the container
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: All elements are iterated throught
     StationID find_station_with_coord(Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.find most expensive, worst case linear->size of the container.
+    // Short rationale for estimate: find has linear perf
     bool change_station_coord(StationID id, Coord newcoord);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.count most expensive, worst case linear->size of the container.
+    // Short rationale for estimate: find has linear perf
     bool add_departure(StationID stationid, TrainID trainid, Time time);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.count most expensive, others logarithmic.
+    // Short rationale for estimate: find has linear perf
     bool remove_departure(StationID stationid, TrainID trainid, Time time);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map and for-loop worst case linear->size of the container
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: Operations within a for loop
     std::vector<std::pair<Time, TrainID>> station_departures_after(StationID stationid, Time time);
 
     // We recommend you implement the operations below only after implementing the ones above
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.insert worst case linear
+    // Short rationale for estimate: find has linear perf
     bool add_region(RegionID id, Name const& name, std::vector<Coord> coords);
 
-    // Estimate of performance: O(1)
-    // Short rationale for estimate: Only returns an already-built datastructure
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: Same operations for every n
     std::vector<RegionID> all_regions();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.find() worst case linear->size of the container.
+    // Short rationale for estimate: find has linear perf
     Name get_region_name(RegionID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unordered_map.find() worst case linear->size of the container.
+    // Short rationale for estimate: find has linear perf
     std::vector<Coord> get_region_coords(RegionID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: worst case O(size())
+    // Short rationale for estimate: find has linear perf
     bool add_subregion_to_region(RegionID id, RegionID parentid);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: unrdered_map.count&unordered_set.insert: worst case O(size())
+    // Short rationale for estimate: find has linear perf
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: Uses recursive function which makes it n log n
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: find has linear perf
     std::vector<RegionID> station_in_regions(StationID id);
 
+    // Non-compulsory operations
 
-
-    // EI-PAKOLLISET Non-compulsory operations
-
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: recursive function with for-loop
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: Stuff is done
     std::vector<RegionID> all_subregions_of_region(RegionID id);
 
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: sort function is O(n log n) according to cppreference
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: something has loops and things
     std::vector<StationID> stations_closest_to(Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: single for-loops multiple times
+    // Short rationale for estimate: find() is linear in performance
     bool remove_station(StationID id);
 
-    // Estimate of performance: O(n log n)
-    // Short rationale for estimate: recursive function called twice
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: iterates throught some things
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
-
 private:
+    // Add stuff needed for your class implementation here
+    struct Departure{StationID stationid; TrainID trainid; Time time;};
+    struct Station{StationID id; Name name; Coord xy; RegionID region; std::vector<Departure> departures;};
+    struct Station_simple{StationID id; Coord xy;};
+    struct Region{RegionID id; Name name; std::vector<Coord> coords;
+                  std::vector<StationID> stations; std::vector<RegionID> subregions; RegionID parentregion;};
+    //struct Train{TrainID id;};
 
+    std::unordered_map<StationID, Station> stations_;
+    std::unordered_map<RegionID,Region> regions_;
 
-    struct station_struct{
-                                  Name name;
-                          Coord coordinates;
-        set<pair<Time, TrainID>> trains_set;
-                     RegionID parent_region;
-
-    };
-
-    struct region_struct{
-                                  Name name;
-           vector<Coord> coordinates_vector;
-        unordered_set <RegionID> subregions;
-         unordered_set <StationID> stations;
-                            RegionID parent;
-    };
-
-                                            //Station related
-     unordered_map <StationID, station_struct> stations_umap_;
-                            vector<StationID> station_vector_;
-                      map<Coord, StationID> coord_as_key_map_;
-                                bool stations_alphabetically_;
-                               bool stations_distance_sorted_;
-
-                                             //Region related
-        unordered_map <RegionID, region_struct> regions_umap_;
-                              vector<RegionID> region_vector_;
-                     unordered_set <RegionID> all_subregions_;
-          unordered_set <StationID> all_stations_for_regions_;
-
-
-                         //recursive function, called from station_in_regions
-       void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
-
-                   //recursive function, called from all_subregions_of_region
-void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
-
-                            //recursive function for common_parent_of_regions
- RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
-
+    std::unordered_map<Coord, StationID, CoordHash> coordsearch_;
 };
 
 #endif // DATASTRUCTURES_HH
