@@ -1,19 +1,17 @@
 // Datastructures.hh
 
+
 #ifndef DATASTRUCTURES_HH
 #define DATASTRUCTURES_HH
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <tuple>
 #include <utility>
 #include <limits>
 #include <functional>
 #include <exception>
-#include <set>
-#include <unordered_set>
-#include <map>
-#include <unordered_map>
 
 // Types for IDs
 using StationID = std::string;
@@ -101,120 +99,134 @@ public:
     ~Datastructures();
 
     // Estimate of performance: O(1)
-    // Short rationale for estimate: complexity of vector.size() is constant
+    // Short rationale for estimate: Only size algorithm used
     unsigned int station_count();
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: complexity of clear() is linear
+    // Estimate of performance: O(1)
+    // Short rationale for estimate: Clear used twice
     void clear_all();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: iterating throught loops is linear push_back() constant
+    // Short rationale for estimate: Transfer top vector only
     std::vector<StationID> all_stations();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find() has linear complexity
+    // Short rationale for estimate: Adding value is O(n) and count is O(1)
     bool add_station(StationID id, Name const& name, Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find() has linear complexity
+    // Short rationale for estimate: Return only stations name by given value
     Name get_station_name(StationID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find() has linear complexity
+    // Short rationale for estimate: Return only stations coordinates by given value
     Coord get_station_coordinates(StationID id);
 
     // We recommend you implement the operations below only after implementing the ones above
 
-    // Estimate of performance: O(n * log(n))
-    // Short rationale for estimate: sort() has linearithmic performance others linear
+    // Estimate of performance: O(n^2logn)
+    // Short rationale for estimate: For loop and push_back twice and sort once
     std::vector<StationID> stations_alphabetically();
 
-    // Estimate of performance: O(n * log(n))
-    // Short rationale for estimate: sort() has linearithmic performance others linear
+    // Estimate of performance: O(n^2logn)
+    // Short rationale for estimate: For loop and push_back twice and sort once
     std::vector<StationID> stations_distance_increasing();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: All elements are iterated throught
+    // Short rationale for estimate: Search by value
     StationID find_station_with_coord(Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Short rationale for estimate: Search by key
     bool change_station_coord(StationID id, Coord newcoord);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Short rationale for estimate: For loop, searches by value are O(1) and push_back is O(1)
     bool add_departure(StationID stationid, TrainID trainid, Time time);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Short rationale for estimate: For loop, searches by value are O(1) and erase by value is O(1)
     bool remove_departure(StationID stationid, TrainID trainid, Time time);
 
-    // Estimate of performance: O(n^2)
-    // Short rationale for estimate: Operations within a for loop
+    // Estimate of performance: O(n*log(n))
+    // Short rationale for estimate: For loop, searches are O(1) and push_back is O(n)
     std::vector<std::pair<Time, TrainID>> station_departures_after(StationID stationid, Time time);
 
     // We recommend you implement the operations below only after implementing the ones above
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Short rationale for estimate: Adding value is O(n) and count is O(1)
     bool add_region(RegionID id, Name const& name, std::vector<Coord> coords);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: Same operations for every n
+    // Short rationale for estimate: For loop and push_back to vector
     std::vector<RegionID> all_regions();
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Short rationale for estimate: Return only stations name by given value
     Name get_region_name(RegionID id);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Short rationale for estimate: Check for id and then return coordinates
     std::vector<Coord> get_region_coords(RegionID id);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: Search with key twice
     bool add_subregion_to_region(RegionID id, RegionID parentid);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: For loop and search for value in vector
     bool add_station_to_region(StationID id, RegionID parentid);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: find has linear perf
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: For loop and push_back in while loop
     std::vector<RegionID> station_in_regions(StationID id);
 
     // Non-compulsory operations
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: Stuff is done
+    // Estimate of performance: O(n*log(n))
+    // Short rationale for estimate: For loop and push_back in while loop
     std::vector<RegionID> all_subregions_of_region(RegionID id);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: something has loops and things
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: 2x for loop and sort and push_back
     std::vector<StationID> stations_closest_to(Coord xy);
 
     // Estimate of performance: O(n)
-    // Short rationale for estimate: find() is linear in performance
+    // Short rationale for estimate: For loop, search by value and erase by value
     bool remove_station(StationID id);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: iterates throught some things
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: 2x while loop
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
 private:
-    // Add stuff needed for your class implementation here
-    struct Departure{StationID stationid; TrainID trainid; Time time;};
-    struct Station{StationID id; Name name; Coord xy; RegionID region; std::vector<Departure> departures;};
-    struct Station_simple{StationID id; Coord xy;};
-    struct Region{RegionID id; Name name; std::vector<Coord> coords;
-                  std::vector<StationID> stations; std::vector<RegionID> subregions; RegionID parentregion;};
-    //struct Train{TrainID id;};
+    // Lets make struct that has station information
+    struct station_information
+    {
+        Name station_name;
+        Coord coord;
+        std::vector<std::pair<Time, TrainID>> departures;
+        RegionID belongs_to = NO_REGION;
+    };
 
-    std::unordered_map<StationID, Station> stations_;
-    std::unordered_map<RegionID,Region> regions_;
+    // Then a map that contains id as key and information as value
+    std::unordered_map<StationID, station_information> station;
 
-    std::unordered_map<Coord, StationID, CoordHash> coordsearch_;
+    // Next we make data structure for regions
+    struct region_information
+    {
+        Name region_name;
+        std::vector<Coord> region_coords;
+        RegionID parent_id;
+    };
+
+    // Then map for it
+    std::unordered_map<RegionID, region_information> region;
+
+    //vector where key is name and value id
+    std::vector<std::pair<Name, StationID>> station_names;
+
 };
 
 #endif // DATASTRUCTURES_HH
