@@ -14,6 +14,12 @@
 #include <limits>
 #include <functional>
 #include <exception>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
+#include <map>
+
+using namespace std;
 
 // Types for IDs
 using StationID = std::string;
@@ -207,7 +213,7 @@ public:
     RegionID common_parent_of_regions(RegionID id1, RegionID id2);
 
     //
-    // New assignment 2 operations
+    // New assignment 2 operations---------------------------------------------------------------------------------------------
     //
 
     // Estimate of performance:
@@ -253,6 +259,55 @@ public:
 
 private:
     // Add stuff needed for your class implementation here
+
+    struct Edge {
+
+                               int distance;        // laskukaava olemassa, jos laskee kaikille lisätyille, saattaa tulla ylimääräisiä ja tehokkuus laskee
+ unordered_map <TrainID, Time> trains_on_this_edge;        //ehkä kellonaika lisäksi, varmaan umappina tämä tai usettinä parina, katsotaan
+    };
+
+
+    struct station_struct{
+                               StationID id;    //lisätty next station from testausta varten, ei tarvetta prg1:ssä ja poista jos teet uuden puun
+                                  Name name;
+                          Coord coordinates;
+        set<pair<Time, TrainID>> trains_set;
+                     RegionID parent_region;
+unordered_map <station_struct*, Edge> to_stations;        //prg2 added, lisätty {} add_station alustukseen vikaks, jos muuttuu poista sieltä
+        //MUUTETTU STATIONSTRUCT OSOITTIMEKSI, aiemmi stationid
+    };
+
+    struct region_struct{
+                                  Name name;
+           vector<Coord> coordinates_vector;
+        unordered_set <RegionID> subregions;
+         unordered_set <StationID> stations;
+                            RegionID parent;
+    };
+
+                                            //Station related
+     unordered_map <StationID, station_struct> stations_umap_;
+                            vector<StationID> station_vector_;
+                      map<Coord, StationID> coord_as_key_map_;
+                                bool stations_alphabetically_;
+                               bool stations_distance_sorted_;
+
+                                             //Region related
+        unordered_map <RegionID, region_struct> regions_umap_;
+                              vector<RegionID> region_vector_;
+                     unordered_set <RegionID> all_subregions_;
+          unordered_set <StationID> all_stations_for_regions_;
+
+
+                         //recursive function, called from station_in_regions
+       void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
+
+                   //recursive function, called from all_subregions_of_region
+void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
+
+                            //recursive function for common_parent_of_regions
+ RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
+
 
 };
 
