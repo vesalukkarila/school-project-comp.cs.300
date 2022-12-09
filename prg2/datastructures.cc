@@ -668,18 +668,25 @@ RegionID Datastructures::recursive_parentregions(const RegionID &id, set<RegionI
 void Datastructures::clear_trains()
 {
     //poistaa kaikki junat stations_umapin jokaisesta asemasta, uskoakseni pitää tehdä
-    for (auto & station : stations_umap_)
+    for (auto & station : stations_umap_){
         station.second.trains_set.clear();
+        station.second.just_trains.clear();
+        station.second.to_stations.clear();
+
+    }
 
     //LISÄÄ POISTOT MUISTA RAKENTESTA--------------------------------------------------------------
 }
 
 /*train.stations-fromissa väärä tulostus, johtunee täältä*/
-/*ENNEN INSERTOIMISTA PITÄISI TARKISTA ONKO YHTEYS (OSOITIN ASEMAAN JA EDGE) JO OLEMASSA, MUUTOIN YLIKIRJOITETAAN OSOITIN
-    HASTAVA TARKISTAA KUN OSOITIN ON STRUCTIIN EIKÄ SUORAAN ASEMAN ID:N, VOISKO MUUTTAA?
-    SAAKO OSOITTIMEN OSOITTAMAAN UMAPIN OLEMASSAOLEVAAN AVAIMEEN, LILLUVAAN SEN SAA TOKI. voiko pointata statins_mappiin
-    sen osoittimen pitäisi osoittaa stationid:n jotta voi vertailla esim tässä ja ehkä myöhemminkin en oo kattonut
-    muutoin pitää loopata läpi to_stations ja tarkistella key.id onko sama. toimii se sillee mutta ainakin ntoiseen*/
+/*kun asemalle laitetaan uusi yhteys toiseen asemaan, ylikirjoittaa edellisen yhteyden,
+ * tpe-kli poistaa tpe-roi:n
+ * tpe-kli välille eli edgelle voi laittaa useita junia eri ajoilla
+ * mutt kun lisää tpe-roi:n uusiks ei näytä sitä, mut näyttää tpe-kli 3 junaa edelleen, eli ei ylikirjoita?
+ * ja kun lisää tpe-roi yhteyden ei näytä sitä
+
+ *1 kerran kun luo uuden jatkoaseman, poistaa edellisen. 2 kerran kun lisää jatkoaseman ei näytä sitä. Ainakaan train_stations_from
+ *MUTTA NÄKYY NEXT_STATIONS_FROM:SSA kaikki jatkoasemat eli ei ryssi to_stations osoittimia lisätessään jatkoasemia!?!?!?!?!*/
 bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID, Time> > stationtimes)
 {
     //ITEROIDAAN LÄPI stationtimes vektorin
@@ -749,8 +756,8 @@ bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID,
 }
 
 
-/*TOIMIII basictestiss*/
-//EI VARMAAN TUHOTTAVAA KUN EI LILLUVIA ASIOITA POINTTERIN PÄÄSSÄ VAAN ON JO VALMIIKSI OLEMASSA
+/*TOIMIII basictestissä moitteetta*/
+//
 std::vector<StationID> Datastructures::next_stations_from(StationID id)
 {
     //throw NotImplemented("next_stations_from()");
@@ -775,22 +782,14 @@ std::vector<StationID> Datastructures::next_stations_from(StationID id)
 }
 
 
-
-
-/*palauttaa vektorin asemista joiden läpi juna kulkee lähdettyään annetulta asemalta.
-Tarkistaa kulkeeko juna edgellä ja lisää to_stations.id (seuraava asema)vektoriin jos kulkee
-pääteaseman edgellä ei kulje junaa ja se asema tulee lisättyä tokavikasta*/
-
-/*next stationfrom toimii moitteetta, eli lisää aseman to_stationiin, mutta ei joko lisää junaa addissa tai ei löydä junaa täällä
-manuaalitestissä ei löydä ensimmäistä turkua, eli oisko viimeinen ylikirjoittanut jotain
-sen pitäisi lisätä juna vain edgelle*/
+/*pääteasema - eli jos ei lähde asemalta, palautetaan no-station vektorissa, nyt tyhjä vektori luulen
+ * */
 std::vector<StationID> Datastructures::train_stations_from(StationID stationid, TrainID trainid)
 {
     vector <StationID> stations;
-    if (stations_umap_.count(stationid) == 0 )
+    if (stations_umap_.count(stationid) == 0 || stations_umap_.at(stationid).just_trains.count(trainid) == 0)
         stations.push_back(NO_STATION);
 
-    //while looppi vai rekursiivinen, saako whilessä muutettua aseman nimeä, tai muussa looppi tavassa
     else{
         recursive_train_stations_from(stationid, trainid, stations);
 
@@ -800,11 +799,7 @@ std::vector<StationID> Datastructures::train_stations_from(StationID stationid, 
 
 }
 
-//struct Edge
-// unordered_map <TrainID, Time> trains_on_this_edge;
 
-//station_struct
-//unordered_map <station_struct*, Edge> to_stations;
 
 void Datastructures::recursive_train_stations_from(const StationID &stationid, const TrainID &trainid, vector<StationID> &stations)
 {
@@ -814,12 +809,25 @@ void Datastructures::recursive_train_stations_from(const StationID &stationid, c
             recursive_train_stations_from(key_value.first->id, trainid, stations);  //.. ja kutsuu rekursiota seuraavalla asemalla
             return;                                                                 // ajatuksella ei jatketa for looppia
         }
-        else
-            return;
+
         /*saisko tehtyä ilman for looppia, hivenen raskas lienee nyt*/
 
     }
+
+    return;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*Palauttaa jonkin reitin annettujen asemien välillä.
 Paluuvektorissa alkuasema ja matka, sitten seuraava asema ja kokonaismatka ko- asemaan saakka*/

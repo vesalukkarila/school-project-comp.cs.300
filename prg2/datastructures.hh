@@ -275,7 +275,7 @@ private:
         set<pair<Time, TrainID>> trains_set;
                      RegionID parent_region;
 unordered_map <station_struct*, Edge> to_stations;        //prg2 added, lisätty {} add_station alustukseen vikaks, jos muuttuu poista sieltä
-                    set<TrainID> just_trains;   //lisätty train_stations_from tarkistuksia varten
+                    set<TrainID> just_trains;   //lisätty train_stations_from tarkistuksia varten, muuta nimi
     };
 
     struct region_struct{
