@@ -263,7 +263,8 @@ private:
     struct Edge {
 
                                int distance;        // laskukaava olemassa, jos laskee kaikille lisätyille, saattaa tulla ylimääräisiä ja tehokkuus laskee
- unordered_map <TrainID, Time> trains_on_this_edge;        //ehkä kellonaika lisäksi, varmaan umappina tämä tai usettinä parina, katsotaan
+ unordered_map <TrainID, Time> trains_on_this_edge;        //time jätetty muttei käytetty vielä, poista jos tarpeeton
+
     };
 
 
@@ -274,7 +275,7 @@ private:
         set<pair<Time, TrainID>> trains_set;
                      RegionID parent_region;
 unordered_map <station_struct*, Edge> to_stations;        //prg2 added, lisätty {} add_station alustukseen vikaks, jos muuttuu poista sieltä
-        //MUUTETTU STATIONSTRUCT OSOITTIMEKSI, aiemmi stationid
+                    set<TrainID> just_trains;   //lisätty train_stations_from tarkistuksia varten
     };
 
     struct region_struct{
@@ -308,6 +309,8 @@ void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
                             //recursive function for common_parent_of_regions
  RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
 
+                                // Recursive function for train_stations_from
+ void recursive_train_stations_from (StationID const& stationid, TrainID const& trainid, vector<StationID>& stations);
 
 };
 
