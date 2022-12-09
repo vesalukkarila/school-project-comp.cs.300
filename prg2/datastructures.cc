@@ -697,11 +697,8 @@ bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID,
 
         Time time = stationtimes.at(first_index).second;
 
-        //jos perusrakenteeseen lisäys aseman trainsettiin onnistuu, on asema olemassa ja juna asemalle uusi, jos ei ja ei paluuarvona tulee false
 
-
-
-        /* jos viimeinen alkio ei haluta lisätä trainssettiin, ainoastaan graafiin ja poistutaan koko funkusta*/
+        /* jos viimeinen alkio, ei lisätä trainssettiin, ainoastaan graafiin ja poistutaan koko funkusta*/
         if (first_index == stationtimes.size() -1){
             Edge payload;
             payload.distance = 0; //etäisyys edelliseen asemaan
@@ -711,26 +708,23 @@ bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID,
             return true;
         }
 
-        /*TÄÄLLÄ SE TAPAHTUU, JUNA EDGELLE JOS ASEMAOSOITIN JO OLEMASSA*/
+        //jos perusrakenteeseen lisäys lähtöaseman trainsettiin onnistuu, on asema olemassa ja juna asemalle uusi, jos ei ja ei paluuarvona tulee false
         else if (add_departure(stationtimes.at(first_index).first, trainid, time)){
 
-
-
                 //jos ennestään osoitin yhteys, lisätään pelkästään edgelle uusi juna
-                //huomioi loopissa et jos ei ole sama kuin secondindex, voi olla eri asema
-                // Käy läpi aseman1 jatkoasemat ja vertaa stationtimes index2:een, jos löytyy jo, lisää kyseisen yhteyden edgelle junan
+                // Käy läpi aseman1 jatkoasemat ja vertaa stationtimes index2:een, jos jatkoasema löytyy jo, lisää junayhteyden edgelle junan
                 for(auto& key_value : stations_umap_.at(stationtimes.at(first_index).first).to_stations){
-                    if (key_value.first->id == stationtimes.at(second_index).first){
-                        key_value.second.trains_on_this_edge.insert({trainid, stationtimes.at(first_index).second});
-                        train_added_to_edge = true;
-                        break;
-                    }
-                    else
-                        continue;
-                }
-                //unordered_map <station_struct*, Edge> to_stations;
 
-                //Jos osoitinyhteyttä ei ennestään olemassa, osoitin asema2:een ja luodaan edge joka alustettu ylempänä
+                    if(key_value.first != nullptr){
+                        if (key_value.first->id == stationtimes.at(second_index).first){    //if jatkoasema on jo..
+                            key_value.second.trains_on_this_edge.insert({trainid, stationtimes.at(first_index).second});//..lisätään edgelle junayhteys
+                            train_added_to_edge = true;
+                            break;  //jos löytynyt ja lisätty edgelle poistutaan loopista, ohittaa seuraavan iffin
+                        }
+                    }
+                }
+
+                //Jos osoitinyhteyttä (jatkoasemaa) ei ennestään olemassa, luodaan osoitin asema2:een ja edge hyötykuormaksi
                 if (!train_added_to_edge){
                     Edge payload;
                     payload.distance = 0;                               //lisää myöhemmin etäisyyden laskenta
@@ -745,8 +739,9 @@ bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID,
                 second_index += 1;
             }
 
+        //jos add_departure:sta palautuu false, asemaa ei ole tai juna ei ole asemalle uusi, return false
         else
-            return false;   /*milloin tulee falseen kun kolmantena*/
+            return false;
 
     }
 
