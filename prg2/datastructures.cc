@@ -107,7 +107,7 @@ std::vector<StationID> Datastructures::all_stations()
 bool Datastructures::add_station(StationID id, const Name& name, Coord xy)
 {
     //HUOM -------------- LISÄTTY ID ESTRUCTIN KAKS NEXT_STATION_FROM TESTAILUA VARTEN, POISTA JOS TARPEETON -----------------------------
-    station_struct value = {id, name, xy, {}, NO_REGION, {}, {}};   //
+    station_struct value = {id, name, xy, {}, NO_REGION, {}, {}, nullptr, white};   //
     if ( stations_umap_.insert({id, value}).second ){           // päätietorakenne asemille
         station_vector_.push_back(id);                          // tietorakenne palautuksia varten, kaikki asemat
         coord_as_key_map_.insert({xy, id});                     // find_station_with_coordia varten
@@ -678,15 +678,7 @@ void Datastructures::clear_trains()
     //LISÄÄ POISTOT MUISTA RAKENTESTA--------------------------------------------------------------
 }
 
-/*train.stations-fromissa väärä tulostus, johtunee täältä*/
-/*kun asemalle laitetaan uusi yhteys toiseen asemaan, ylikirjoittaa edellisen yhteyden,
- * tpe-kli poistaa tpe-roi:n
- * tpe-kli välille eli edgelle voi laittaa useita junia eri ajoilla
- * mutt kun lisää tpe-roi:n uusiks ei näytä sitä, mut näyttää tpe-kli 3 junaa edelleen, eli ei ylikirjoita?
- * ja kun lisää tpe-roi yhteyden ei näytä sitä
-
- *1 kerran kun luo uuden jatkoaseman, poistaa edellisen. 2 kerran kun lisää jatkoaseman ei näytä sitä. Ainakaan train_stations_from
- *MUTTA NÄKYY NEXT_STATIONS_FROM:SSA kaikki jatkoasemat eli ei ryssi to_stations osoittimia lisätessään jatkoasemia!?!?!?!?!*/
+/* KORJAA RASKAAT TOISTUVAT INDEKSOINNIT, FIRSTSTATION JA SECONDSTATION VARMASTI TOIMII NYT----------------------------*/
 bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID, Time> > stationtimes)
 {
     //ITEROIDAAN LÄPI stationtimes vektorin
@@ -705,7 +697,8 @@ bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID,
         Time time = stationtimes.at(first_index).second;
 
 
-        /* jos viimeinen alkio, ei lisätä trainssettiin, ainoastaan graafiin ja poistutaan koko funkusta*/
+        /* jos viimeinen alkio(pääteasema), ei lisätä trainssettiin, ainoastaan graafiin ja poistutaan koko funkusta
+        täällä lisätään osoittimeksi nullptr koska ei jatkoyhteyttä ja payloadiin asemalle saapumisaika*/
         if (first_index == stationtimes.size() -1){
             Edge payload;
             payload.distance = 0; //etäisyys edelliseen asemaan
@@ -734,7 +727,9 @@ bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID,
                 //Jos osoitinyhteyttä (jatkoasemaa) ei ennestään olemassa, luodaan osoitin asema2:een ja edge hyötykuormaksi
                 if (!train_added_to_edge){
                     Edge payload;
-                    payload.distance = 0;                               //lisää myöhemmin etäisyyden laskenta
+                    payload.distance = distance_between_stations(
+                                stations_umap_.at(stationtimes.at(first_index).first).coordinates,
+                                stations_umap_.at(stationtimes.at(second_index).first).coordinates);                               //lisää myöhemmin etäisyyden laskenta
                     payload.trains_on_this_edge.insert({trainid, stationtimes.at(first_index).second});  //alustetaan edgelle junaid ja lähtöaika
 
 
@@ -754,6 +749,14 @@ bool Datastructures::add_train(TrainID trainid, std::vector<std::pair<StationID,
 
     return true;
 }
+
+int Datastructures::distance_between_stations(Coord coord1, Coord coord2)
+{
+    int dist = sqrt( pow(coord1.x-coord2.x, 2) + pow(coord1.y - coord2.y, 2) );
+    return dist;
+}
+
+
 
 
 /*TOIMIII basictestissä moitteetta*/
@@ -829,23 +832,170 @@ void Datastructures::recursive_train_stations_from(const StationID &stationid, c
 
 
 
+
 /*Palauttaa jonkin reitin annettujen asemien välillä.
 Paluuvektorissa alkuasema ja matka, sitten seuraava asema ja kokonaismatka ko- asemaan saakka*/
 /*Jos nykyinen rakenne: käy läpi to_stations kaikki osoittimet seuraaviin asemiin ja niiden kaikki osoittimet
  * seuraaviin asemiin. Tarkistaa joka kerta onko kohde asema saavutettu. Ei tarvi olla sama juna eikä ajasta tarvi välittää.
 Eli riittää kun pystyy osoittimilla liikkumaan lähtöasemasta kohdeasemaan, kertomaan mitä asemia pitkin tultiin ja etäisyydet*/
-std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID /*fromid*/, StationID /*toid*/)
+
+
+/*Ennen kuin aloitat: Lisääkö nyt junan pääteaseman kaarelle vai pelkän etäisyyden.
+ * pääteasemalla voi olla useampi nullptr-osoitin (usean reitin pääteasema) jonka takana edge jossa ei junaa ja vain etäisyys*/
+
+
+/*asema1-etäisyys 0
+ * asema2-etäisyys 1-2
+ * asema3-etäisyys 2-3*/
+std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID fromid, StationID toid)
 {
-    // Replace the line below with your implementation
-    // Also uncomment parameters ( /* param */ -> param )
-    throw NotImplemented("route_any()");
+    /*jos väri: alussa valkoinen, kun käyty harmaa, mustaksi milloin
+     * löytää reitin
+     * jos askeltais alusta ja samalla vektoriin, etäisyys kaarelta, eli kaarella olisi etäisyys siihen asemaan
+     * tai kun pääteasema löytyy laittaa takaperinaskelluksessa vektoriin ja kääntää/kopioi reverseiteraattorilla palautusvektoriin*
+     * Oikeastaan etäisyydet voi alustaa nolliksi ja laskea vektorin lisäämisen jälkeen tai yhteydessä */
+
+    //nollataan väri ja osoitinedelliseenasemaan
+    for (auto& station : stations_umap_){
+       station.second.previous_station = nullptr;
+       station.second.color = white;
+   }
+
+    vector<pair<StationID, Distance>> path;
+    stack<StationID> workstack;
+
+    workstack.push(fromid);
+
+    while ( !workstack.empty() ) {
+
+        StationID currentstation = workstack.top(); //pop eli poisto ehkä myöhemmin
+
+        if (stations_umap_.at(currentstation).color == white){
+
+            //asema merkitään harmaaksi kun sen jatkoasemia aletaan käsitellä
+            stations_umap_.at(currentstation).color = grey;
+            workstack.push(currentstation);
+
+            //jatkoasemien laitto stackkiin
+            for (auto& key_value : stations_umap_.at(currentstation).to_stations) {       //for v in u->adj, umap tostations osoittimiet stationstructeihin
+
+                if (key_value.first->color == white){
+                    //jos valkonen, stationid laitetaan pinoon
+                    workstack.push(key_value.first->id);     //TÄSSÄ voi olla fiba, pinoon pako työntää stationid, voisko pinossa olla osoittimia stationstructiin, helpottaisko
+                    key_value.first->previous_station = &currentstation;    //nyt stationid osoitin, jos staitonstruct onnistuu sekin
+
+
+
+                    //to_station osoittimen päässä pääteasema jota etsitään
+                    if (key_value.first->id == toid)
+                    {
+                       // recursive_route_any(fromid, currentstation, toid, path);
+
+                        StationID station2id = key_value.first->id;  //stationid, alunperin tyyppiä <*station_struct, edge>
+                        station_struct* station2struct = key_value.first;
+                        auto station2edge = key_value.second;   //turha??
+                        StationID* station1 = &currentstation;         //stationid
+
+
+
+                        while ( true ){
+
+                            if ( station2id != fromid ) {
+
+                                auto iter = path.begin();
+                                //yritän: vektoriin löydetyn jatkopääteaseman id ja edellisen aseman tähän asemaan osoittavan hyötykuorman edgellä et
+                                int distance_to_this_station = stations_umap_.at(*station1).to_stations.at(station2struct).distance;
+                                //insertoin ensimmäiseksi alkioksi
+                                path.insert(iter, {key_value.first->id, distance_to_this_station});
+
+
+                                station2struct = &stations_umap_.at(*station1);
+                                station2id = stations_umap_.at(*station1).id;
+
+                              //EI MUUTA STATION1.preivous EDELLISEEN ASEMAAN, vaan jää station2 previouksi
+
+                                station1 = stations_umap_.at(*station1).previous_station;   //vitunvitunvittu
+                                //siis yritän laittaa osoittimelle toisen osoittimen osoittamaa muistiosoitetta
+
+
+
+                            }
+                            //kun alkuasema löytyy, sillä pitäis olla nullptr
+                            else{
+                                auto iter = path.begin();
+                                path.insert(iter, {station2id, 0});
+                                break;
+                            }
+
+
+                        }
+
+                          //SITTEN VEKTORIN LÄPIKÄYNTI JA ETÄISYYDEN SUMMAUS  JA RETURN
+                        return path;
+
+                    }
+
+
+
+                }
+                //jos silmukka eli harmaa
+                else if (key_value.first->color == grey){
+                    continue;   //toistaiseksi continue
+                }
+
+            }
+        }
+
+        //jos stackista otettu asema on harmaa, kaikki sen jatkoasemat on käsitelty ( ja lisätty valkoisina stackkiin)
+        else
+            stations_umap_.at(currentstation).color = black;
+
+
+    }
+
+    //jos ei löydy sitä ja tätä
+    return path;
 }
 
 
+/*
+
+void Datastructures::recursive_route_any(const StationID &fromid, StationID previous, const StationID &toid, vector<std::pair<StationID, Distance>> &path)
+{
+    auto iter = path.begin();
+
+    //triviaali, kun lähtöasema saavutettu
+    if (toid == fromid){
+        path.insert(iter, {fromid, 0});
+        return;
+    }
+
+    int distance_to_this_station = stations_umap_.at(previous).to_stations.
 
 
 
 
+
+
+    //rekursio kutsu (&fromid, &currentend, &path)
+
+    //jos ei annettu lähtöasema, nullptr pitäs toimia koska pitäs säilyy lähtöasemalla
+    if ( stations_umap.at(toid).previous_station != nullptr){
+
+        auto iter = path.begin();
+        //yritän: vektoriin löydetyn jatkopääteaseman id ja osoittimen päässä olevan aseman tähän asemaan osoittavan hyötykuorman edgellä et
+        int distance_to_this_station = stations_umap_.at(currentstation).to_stations.at(key_value.first).distance;
+        //insertoin ensimmäiseksi alkioksi
+        path.insert(iter, {key_value.first->id, distance_to_this_station});
+
+    }
+    //kun
+    else{
+        path.insert(iter, {key_value.first->id}, 0);
+    }
+}
+
+*/
 
 
 
@@ -857,6 +1007,7 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_least_stations
     throw NotImplemented("route_least_stations()");
 }
 
+    //DFS ainakin selvittää silmukan
 std::vector<StationID> Datastructures::route_with_cycle(StationID /*fromid*/)
 {
     // Replace the line below with your implementation
@@ -864,6 +1015,8 @@ std::vector<StationID> Datastructures::route_with_cycle(StationID /*fromid*/)
     throw NotImplemented("route_with_cycle()");
 }
 
+
+//Dijkstra
 std::vector<std::pair<StationID, Distance>> Datastructures::route_shortest_distance(StationID /*fromid*/, StationID /*toid*/)
 {
     // Replace the line below with your implementation

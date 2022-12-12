@@ -18,6 +18,7 @@
 #include <set>
 #include <unordered_set>
 #include <map>
+#include <stack>
 
 using namespace std;
 
@@ -267,15 +268,18 @@ private:
 
     };
 
+    enum Color {white, grey, black};
 
     struct station_struct{
                                StationID id;    //lisätty next station from testausta varten, ei tarvetta prg1:ssä ja poista jos teet uuden puun
                                   Name name;
                           Coord coordinates;
-        set<pair<Time, TrainID>> trains_set;
+        set<pair<Time, TrainID>> trains_set;    //juna ei näy täällä jos pääteasema -> addtrain
                      RegionID parent_region;
 unordered_map <station_struct*, Edge> to_stations;        //prg2 added, lisätty {} add_station alustukseen vikaks, jos muuttuu poista sieltä
-                    set<TrainID> just_trains;   //lisätty train_stations_from tarkistuksia varten, muuta nimi
+                    set<TrainID> just_trains;   //jos lähtee asemalta, mutta ei lisätä addtrainissa jos pääteasema
+             StationID* previous_station;   //stationid vai stationstruct??
+                                Color color;
     };
 
     struct region_struct{
@@ -311,6 +315,10 @@ void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
                                 // Recursive function for train_stations_from
  void recursive_train_stations_from (StationID const& stationid, TrainID const& trainid, vector<StationID>& stations);
+
+                    int distance_between_stations (Coord coord1, Coord coord2);
+
+void recursive_route_any (StationID const& fromid, StationID previous, StationID const& toid, vector<std::pair<StationID, Distance>>& path );
 
 };
 
