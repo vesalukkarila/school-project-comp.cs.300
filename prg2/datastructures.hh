@@ -319,8 +319,8 @@ void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
                     int distance_between_stations (Coord& coord1, Coord& coord2);
 
-void recursive_route_any (StationID const& fromid, StationID const& station1id, StationID const& station2id, station_struct* const& station2struct, vector<std::pair<StationID, Distance>>& route );
-bool recursive_to_stations (StationID fromid, StationID toid, station_struct* const& station2struct, vector<std::pair<StationID, Distance> > &route);
+void recursive_route_any (StationID const& fromid, StationID const& station1id, StationID const& station2id, station_struct* const & station2struct, vector<std::pair<StationID, Distance>>& route );
+bool recursive_to_stations (StationID& fromid, StationID& toid, StationID& station1id, StationID& station2id, station_struct*  station2struct, vector<std::pair<StationID, Distance> > &route);
 };
 
 #endif // DATASTRUCTURES_HH
