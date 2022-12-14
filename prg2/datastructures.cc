@@ -768,6 +768,7 @@ int Datastructures::distance_between_stations(Coord& coord1, Coord& coord2)
 
 
 
+
 /**
  * @brief Datastructures::next_stations_from finds stations a trainconnection is established from the given station
  * @param id, string, stationid unique to each station
@@ -908,24 +909,26 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
 
                     //to_station osoittimen päässä pääteasema jota etsitään
                     if (jatkoasema.first->id == toid)
+
+
+
+
                     {
 
+                        //   station_struct* station2struct = jatkoasema.first;
+                        recursive_route_any(fromid, currentstation, jatkoasema.first->id, jatkoasema.first, route);
+
+
+                    /*
                         StationID station2id = jatkoasema.first->id;      //stationid, alunperin tyyppiä <*station_struct, edge>
                         station_struct* station2struct = jatkoasema.first;
                         //auto station2edge = key_value.second;            //turha??
-                        StationID* station1 = &currentstation;           //stationid, voiko muuttaa??
+             //           StationID* station1 = &currentstation;           //stationid, voiko muuttaa??
                         StationID stationeka = currentstation;
-
-                        //Testi,
-
-                   //     auto& ptr_previous_jatkoaseman = stations_umap_.at(station2id).previous_station;
-
-                  //      auto& ptr_previous_nykyisen = stations_umap_.at(currentstation).previous_station;
-
 
                         while ( true ){
 
-                            if ( stationeka != NO_STATION ) {
+                            if ( station2id != fromid ) {
 
 
                                 int distance_to_this_station = stations_umap_.at(stationeka).to_stations.at(station2struct).distance;
@@ -949,6 +952,7 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
 
                         }
 
+                        */
 
 
                           //SITTEN VEKTORIN LÄPIKÄYNTI JA ETÄISYYDEN SUMMAUS NYT ETÄISYYDET ON EDELLISEEN ASEMAAN JA RETURN
@@ -960,11 +964,7 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
 
                         }
                         return final;
-
                     }
-
-
-
                 }
                 //jos silmukka eli harmaa
                 else if (jatkoasema.first->color == grey){
@@ -985,45 +985,41 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
     return route;
 }
 
-
-/*
-
-void Datastructures::recursive_route_any(const StationID &fromid, StationID previous, const StationID &toid, vector<std::pair<StationID, Distance>> &path)
+//pääteasema löytynyt = station2id, current = staiton1id
+void Datastructures::recursive_route_any(const StationID &fromid, StationID const& station1id, StationID const& station2id,
+                                         station_struct* const& station2struct, vector<std::pair<StationID, Distance> > &route)
 {
-    auto iter = path.begin();
 
-    //triviaali, kun lähtöasema saavutettu
-    if (toid == fromid){
-        path.insert(iter, {fromid, 0});
+    if ( station2id != fromid ) {
+
+
+        int distance_to_this_station = stations_umap_.at(station1id).to_stations.at(station2struct).distance;
+
+
+        //lisäys paikallisvektoriin jonka etäisyydet muokataan while-loopista poistuttaessa
+        route.push_back ({station2id, distance_to_this_station});
+
+        recursive_route_any(fromid, stations_umap_.at(station1id).previous_statioid, station1id, &stations_umap_.at(station1id), route);
+        /*
+        //MUUTOKSET: yksi taaksepäin
+        station2struct = &stations_umap_.at(station1id);
+        station2id = station1id;
+        station1id = stations_umap_.at(station1id).previous_statioid; //TÄÄLLÄ, *station1 = "tpe", station2id=tpe, *station2struct=tpe
+        */
+    }
+
+    else{
+        route.push_back({station2id, 0});
         return;
     }
 
-    int distance_to_this_station = stations_umap_.at(previous).to_stations.
 
-
-
-
-
-
-    //rekursio kutsu (&fromid, &currentend, &path)
-
-    //jos ei annettu lähtöasema, nullptr pitäs toimia koska pitäs säilyy lähtöasemalla
-    if ( stations_umap.at(toid).previous_station != nullptr){
-
-        auto iter = path.begin();
-        //yritän: vektoriin löydetyn jatkopääteaseman id ja osoittimen päässä olevan aseman tähän asemaan osoittavan hyötykuorman edgellä et
-        int distance_to_this_station = stations_umap_.at(currentstation).to_stations.at(key_value.first).distance;
-        //insertoin ensimmäiseksi alkioksi
-        path.insert(iter, {key_value.first->id, distance_to_this_station});
-
-    }
-    //kun
-    else{
-        path.insert(iter, {key_value.first->id}, 0);
-    }
 }
 
-*/
+
+
+
+
 
 
 

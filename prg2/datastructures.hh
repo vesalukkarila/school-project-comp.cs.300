@@ -319,7 +319,7 @@ void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
                     int distance_between_stations (Coord& coord1, Coord& coord2);
 
-void recursive_route_any (StationID const& fromid, StationID previous, StationID const& toid, vector<std::pair<StationID, Distance>>& path );
+void recursive_route_any (StationID const& fromid, StationID const& station1id, StationID const& station2id, station_struct* const& station2struct, vector<std::pair<StationID, Distance>>& route );
 
 };
 
