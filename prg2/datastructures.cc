@@ -873,16 +873,30 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
      * jos askeltais alusta ja samalla vektoriin, etäisyys kaarelta, eli kaarella olisi etäisyys siihen asemaan
      * tai kun pääteasema löytyy laittaa takaperinaskelluksessa vektoriin ja kääntää/kopioi reverseiteraattorilla palautusvektoriin*
      * Oikeastaan etäisyydet voi alustaa nolliksi ja laskea vektorin lisäämisen jälkeen tai yhteydessä */
+/*
+    //REKURSIOYRITYS
+    vector<pair<StationID, Distance>> route;
+
+    for (auto& station : stations_umap_.at(fromid).to_stations){    //struct, edge
+
+            station.first->previous_statioid = fromid;
+            if (station.first->id == toid){
+                route.push_back()
+            }
+
+    }
+  */
 
     //nollataan väri ja osoitinedelliseenasemaan
     for (auto& station : stations_umap_){
-       station.second.previous_station = nullptr;
+     //  station.second.previous_station = nullptr;
        station.second.color = white;
+       station.second.previous_statioid = NO_STATION;
    }
 
-    vector<pair<StationID, Distance>> route;
+ //   vector<pair<StationID, Distance>> route;
     stack<StationID> workstack;
-
+    vector<pair<StationID, Distance>> route;
     workstack.push(fromid);
 
     while ( !workstack.empty() ) {
@@ -904,7 +918,7 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
                 if (jatkoasema.first->color == white){
                     //jos valkonen, stationid laitetaan pinoon
                     workstack.push(jatkoasema.first->id);
-                    jatkoasema.first->previous_station = &currentstation;
+          //          jatkoasema.first->previous_station = &currentstation;
                     jatkoasema.first->previous_statioid = currentstation;
 
                     //to_station osoittimen päässä pääteasema jota etsitään
