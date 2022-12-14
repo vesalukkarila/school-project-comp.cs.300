@@ -280,6 +280,7 @@ unordered_map <station_struct*, Edge> to_stations;        //prg2 added, lisätty
                     set<TrainID> just_trains;   //jos lähtee asemalta, mutta ei lisätä addtrainissa jos pääteasema
              StationID* previous_station;   //stationid vai stationstruct??
                                 Color color;
+                                StationID previous_statioid;
     };
 
     struct region_struct{
@@ -316,7 +317,7 @@ void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
                                 // Recursive function for train_stations_from
  void recursive_train_stations_from (StationID const& stationid, TrainID const& trainid, vector<StationID>& stations);
 
-                    int distance_between_stations (Coord coord1, Coord coord2);
+                    int distance_between_stations (Coord& coord1, Coord& coord2);
 
 void recursive_route_any (StationID const& fromid, StationID previous, StationID const& toid, vector<std::pair<StationID, Distance>>& path );
 
