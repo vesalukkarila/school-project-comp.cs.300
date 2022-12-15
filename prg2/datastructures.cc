@@ -875,35 +875,53 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
      * Oikeastaan etäisyydet voi alustaa nolliksi ja laskea vektorin lisäämisen jälkeen tai yhteydessä */
 
     //REKURSIOYRITYS
-
+    vector<pair<StationID, Distance>> route;
+    if (stations_umap_.count(fromid) == 0 || stations_umap_.count(toid) == 0){
+        route.push_back({NO_STATION, NO_DISTANCE });
+        return route;
+    }
     for (auto& station : stations_umap_){
      //  station.second.previous_station = nullptr;
        station.second.color = white;
-       station.second.previous_statioid = NO_STATION;
+       station.second.previous_stationid = NO_STATION;
     }
-    vector<pair<StationID, Distance>> route;
 
-    for (auto& station : stations_umap_.at(fromid).to_stations){    //struct, edge
 
-            station.first->previous_statioid = fromid;  //edellisen merkintä, rekusioon
-            auto result = recursive_to_stations(fromid, toid, fromid, station.first->id, station.first, route);
-            if (result){
-                auto totaldistance = 0;
-                vector <pair<StationID, Distance>> final;
-                for (auto it = route.rbegin(); it != route.rend(); ++it){
-                    totaldistance += it->second;
-                    final.push_back({it->first, totaldistance});
+    if (!stations_umap_.at(fromid).just_trains.empty()){
+
+
+        for (auto& station : stations_umap_.at(fromid).to_stations){
+
+            if (station.first != nullptr && station.first->color == white  ){
+
+
+                station.first->color = grey;
+                station.first->previous_stationid = fromid;
+                recursive_to_stations(fromid, toid, fromid, station.first->id, station.first, route);
+
+                if ( !route.empty() ) {
+                    auto totaldistance = 0;
+                    vector <pair<StationID, Distance>> final;
+                    for (auto it = route.rbegin(); it != route.rend(); ++it){
+                        totaldistance += it->second;
+                        final.push_back({it->first, totaldistance});
+                    }
+
+
+                    return final;
                 }
-                return final;
             }
-}
+
+        }
+      }
 
     return route;
 
 
+//ALLA VANHA TOTEUTUS JOKA TOIMI OIKEIN, MUTTA DUMPED CORE-----------------------
 /*
 
-    //TÄSTÄ ETEENPÄIN VANHA KOKONAISUUS ------------------------------
+    //TÄSTÄ ETEENPÄIN VANHA KOKONAISUUS JOKA DUMPED CORE------------------------------
     //nollataan väri ja osoitinedelliseenasemaan
     for (auto& station : stations_umap_){
      //  station.second.previous_station = nullptr;
@@ -975,9 +993,12 @@ std::vector<std::pair<StationID, Distance>> Datastructures::route_any(StationID 
 
 
     }
-*/
+
     //jos ei löydy sitä ja tätä
     return route;
+
+    */
+
 }
 
 
@@ -996,9 +1017,11 @@ void Datastructures::recursive_route_any(const StationID &fromid, StationID cons
         //lisäys paikallisvektoriin jonka etäisyydet muokataan while-loopista poistuttaessa
         route.push_back ({station2id, distance_to_this_station});
 
-        recursive_route_any(fromid, stations_umap_.at(station1id).previous_statioid, station1id, &stations_umap_.at(station1id), route);
+        recursive_route_any(fromid, stations_umap_.at(station1id).previous_stationid, station1id, &stations_umap_.at(station1id), route);
+
+
         /*
-        //MUUTOKSET: yksi taaksepäin
+        //TARPEETTOMAT VANHAT MUUTOKSET: yksi taaksepäin
         station2struct = &stations_umap_.at(station1id);
         station2id = station1id;
         station1id = stations_umap_.at(station1id).previous_statioid; //TÄÄLLÄ, *station1 = "tpe", station2id=tpe, *station2struct=tpe
@@ -1011,25 +1034,33 @@ void Datastructures::recursive_route_any(const StationID &fromid, StationID cons
     }
 }
 
-bool Datastructures::recursive_to_stations(StationID& fromid, StationID& toid, StationID& station1id, StationID& station2id,
-                                           station_struct*  station2struct, vector<std::pair<StationID, Distance> > &route)
+void Datastructures::recursive_to_stations(StationID & fromid, StationID & toid, StationID & station1id, StationID & station2id,
+                                           station_struct* station2struct, vector<std::pair<StationID, Distance> > &route)
 {
-    station2struct->previous_statioid = station1id;
+    station2struct->previous_stationid = station1id;
+    //stations_umap_.at(station2id).previous_stationid = station1id;
 
     if (station2id == toid) {
         recursive_route_any(fromid, station1id, station2id, station2struct, route);
-        return true;
+        return;
     }
-    if ( ! station2struct->to_stations.empty() ){
+
+    if ( ! station2struct->just_trains.empty()){
 
         for(auto& jatkoasema : station2struct->to_stations){
 
-            recursive_to_stations(fromid, toid, station2id, jatkoasema.first->id, jatkoasema.first, route);
+            if (jatkoasema.first->color == white && jatkoasema.first != nullptr){
+
+                jatkoasema.first->previous_stationid = grey;
+                recursive_to_stations(fromid, toid, station2id, jatkoasema.first->id, jatkoasema.first, route);
+                return;
+
+            }
 
         }
 
     }
-    return false;
+    return;
 }
 
 
