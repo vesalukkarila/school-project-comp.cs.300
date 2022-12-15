@@ -221,8 +221,8 @@ public:
     // Short rationale for estimate: two inside loops
     bool add_train(TrainID trainid, std::vector<std::pair<StationID, Time>> stationtimes);
 
-    // Estimate of performance: O(n)
-    // Short rationale for estimate: for loop
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: single for loop with linear operations
     std::vector<StationID> next_stations_from(StationID id);
 
     // Estimate of performance: O(n log n)
