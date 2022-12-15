@@ -1049,7 +1049,7 @@ void Datastructures::recursive_to_stations(StationID & fromid, StationID & toid,
 
         for(auto& jatkoasema : station2struct->to_stations){
 
-            if (jatkoasema.first->color == white && jatkoasema.first != nullptr){
+            if (jatkoasema.first != nullptr && jatkoasema.first->color == white ){
 
                 jatkoasema.first->previous_stationid = grey;
                 recursive_to_stations(fromid, toid, station2id, jatkoasema.first->id, jatkoasema.first, route);
