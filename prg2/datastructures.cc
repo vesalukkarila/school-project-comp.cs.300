@@ -1012,14 +1012,13 @@ void Datastructures::recursive_route_any(const StationID &fromid, StationID cons
 
 
         int distance_to_this_station = stations_umap_.at(station1id).to_stations.at(station2struct).distance;
-
-
-        //lisäys paikallisvektoriin jonka etäisyydet muokataan while-loopista poistuttaessa
         route.push_back ({station2id, distance_to_this_station});
+
 
         if (stations_umap_.at(station1id).previous_stationid != NO_STATION){
 
             recursive_route_any(fromid, stations_umap_.at(station1id).previous_stationid, station1id, &stations_umap_.at(station1id), route);
+            return;
         }
         else{
             route.push_back({station1id, 0});
@@ -1052,7 +1051,7 @@ void Datastructures::recursive_to_stations(StationID & fromid, StationID & toid,
 
                 jatkoasema.first->previous_stationid = grey;
                 recursive_to_stations(fromid, toid, station2id, jatkoasema.first->id, jatkoasema.first, route);
-                return;
+
 
             }
 
