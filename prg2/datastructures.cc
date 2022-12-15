@@ -1024,8 +1024,6 @@ void Datastructures::recursive_route_any(const StationID &fromid, StationID cons
             route.push_back({station1id, 0});
             return;
         }
-
-
     }
 
 
@@ -1049,8 +1047,9 @@ void Datastructures::recursive_to_stations(StationID & fromid, StationID & toid,
 
             if (jatkoasema.first != nullptr && jatkoasema.first->color == white ){
 
-                jatkoasema.first->previous_stationid = grey;
-                recursive_to_stations(fromid, toid, station2id, jatkoasema.first->id, jatkoasema.first, route);
+                jatkoasema.first->color = grey;
+                jatkoasema.first->previous_stationid = station2id;
+                return recursive_to_stations(fromid, toid, station2id, jatkoasema.first->id, jatkoasema.first, route);
 
 
             }
