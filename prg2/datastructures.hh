@@ -217,24 +217,24 @@ public:
     // New assignment 2 operations---------------------------------------------------------------------------------------------
     //
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n^2)
+    // Short rationale for estimate: two inside loops
     bool add_train(TrainID trainid, std::vector<std::pair<StationID, Time>> stationtimes);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: for loop
     std::vector<StationID> next_stations_from(StationID id);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: recursive with for loop
     std::vector<StationID> train_stations_from(StationID stationid, TrainID trainid);
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n)
+    // Short rationale for estimate: single for loop
     void clear_trains();
 
-    // Estimate of performance:
-    // Short rationale for estimate:
+    // Estimate of performance: O(n log n)
+    // Short rationale for estimate: two recursive function
     std::vector<std::pair<StationID, Distance>> route_any(StationID fromid, StationID toid);
 
 
@@ -263,32 +263,32 @@ private:
 
     struct Edge {
 
-                               int distance;        // laskukaava olemassa, jos laskee kaikille lisätyille, saattaa tulla ylimääräisiä ja tehokkuus laskee
- unordered_map <TrainID, Time> trains_on_this_edge;        //time jätetty muttei käytetty vielä, poista jos tarpeeton
+                                      int distance;
+ unordered_map <TrainID, Time> trains_on_this_edge;
 
     };
 
-    enum Color {white, grey, black};
+                    enum Color {white, grey, black};
 
-    struct station_struct{
-                               StationID id;    //lisätty next station from testausta varten, ei tarvetta prg1:ssä ja poista jos teet uuden puun
-                                  Name name;
-                          Coord coordinates;
-        set<pair<Time, TrainID>> trains_set;    //juna ei näy täällä jos pääteasema -> addtrain
-                     RegionID parent_region;
-unordered_map <station_struct*, Edge> to_stations;        //prg2 added, lisätty {} add_station alustukseen vikaks, jos muuttuu poista sieltä
-                    set<TrainID> just_trains;   //jos lähtee asemalta, mutta ei lisätä addtrainissa jos pääteasema
-             StationID* previous_station;   //stationid vai stationstruct??
-                                Color color;
-                                StationID previous_stationid;
+                            struct station_struct{
+
+                                     StationID id;
+                                        Name name;
+                                Coord coordinates;
+              set<pair<Time, TrainID>> trains_set;
+                           RegionID parent_region;
+unordered_map <station_struct*, Edge> to_stations;
+                         set<TrainID> just_trains;
+                                      Color color;
+                     StationID previous_stationid;
     };
 
     struct region_struct{
-                                  Name name;
-           vector<Coord> coordinates_vector;
-        unordered_set <RegionID> subregions;
-         unordered_set <StationID> stations;
-                            RegionID parent;
+                                        Name name;
+                 vector<Coord> coordinates_vector;
+              unordered_set <RegionID> subregions;
+               unordered_set <StationID> stations;
+                                  RegionID parent;
     };
 
                                             //Station related
@@ -306,21 +306,25 @@ unordered_map <station_struct*, Edge> to_stations;        //prg2 added, lisätty
 
 
                          //recursive function, called from station_in_regions
-       void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
+void recursive_parent_regions(RegionID const& id, vector<RegionID>& v);
 
                    //recursive function, called from all_subregions_of_region
 void recursive_subregions_to_regions(RegionID const& id, vector<RegionID>& v);
 
                             //recursive function for common_parent_of_regions
- RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
+RegionID recursive_parentregions(RegionID const& id, set<RegionID>& parents);
 
                                 // Recursive function for train_stations_from
- void recursive_train_stations_from (StationID const& stationid, TrainID const& trainid, vector<StationID>& stations);
+void recursive_train_stations_from (StationID const& stationid, TrainID const& trainid, vector<StationID>& stations);
 
-                    int distance_between_stations (Coord& coord1, Coord& coord2);
+int distance_between_stations (Coord& coord1, Coord& coord2);
 
-void recursive_route_any (StationID const& fromid, StationID const& station1id, StationID const& station2id, station_struct* const& station2struct, vector<std::pair<StationID, Distance>>& route );
-void recursive_to_stations (StationID& fromid, StationID& toid, StationID& station1id, StationID& station2id, station_struct* station2struct, vector<std::pair<StationID, Distance> > &route);
+void recursive_to_stations (StationID& fromid, StationID& toid, StationID& station1id, StationID& station2id,
+                          station_struct* station2struct, vector<std::pair<StationID, Distance> > &route);
+
+void recursive_end_station_found (StationID const& fromid, StationID const& station1id, StationID const& station2id,
+                          station_struct* const& station2struct, vector<std::pair<StationID, Distance>>& route );
+
 };
 
 #endif // DATASTRUCTURES_HH
