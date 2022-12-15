@@ -1017,28 +1017,27 @@ void Datastructures::recursive_route_any(const StationID &fromid, StationID cons
         //lisäys paikallisvektoriin jonka etäisyydet muokataan while-loopista poistuttaessa
         route.push_back ({station2id, distance_to_this_station});
 
-        recursive_route_any(fromid, stations_umap_.at(station1id).previous_stationid, station1id, &stations_umap_.at(station1id), route);
+        if (stations_umap_.at(station1id).previous_stationid != NO_STATION){
+
+            recursive_route_any(fromid, stations_umap_.at(station1id).previous_stationid, station1id, &stations_umap_.at(station1id), route);
+        }
+        else{
+            route.push_back({station1id, 0});
+            return;
+        }
 
 
-        /*
-        //TARPEETTOMAT VANHAT MUUTOKSET: yksi taaksepäin
-        station2struct = &stations_umap_.at(station1id);
-        station2id = station1id;
-        station1id = stations_umap_.at(station1id).previous_statioid; //TÄÄLLÄ, *station1 = "tpe", station2id=tpe, *station2struct=tpe
-        */
     }
 
-    else{
-        route.push_back({station2id, 0});
-        return;
-    }
+
+    return;
+
 }
 
 void Datastructures::recursive_to_stations(StationID & fromid, StationID & toid, StationID & station1id, StationID & station2id,
                                            station_struct* station2struct, vector<std::pair<StationID, Distance> > &route)
 {
     station2struct->previous_stationid = station1id;
-    //stations_umap_.at(station2id).previous_stationid = station1id;
 
     if (station2id == toid) {
         recursive_route_any(fromid, station1id, station2id, station2struct, route);
