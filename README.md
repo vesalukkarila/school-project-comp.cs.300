@@ -1,6 +1,6 @@
 # school-project-comp.cs.300
-Datastructures & algorithms -course. Individual project, autumn -22.
-
+- Datastructures & algorithms -course. Individual project, autumn -22.
+- - Overall grade for the course: 4
 ## Usage
 
 ### Run locally
