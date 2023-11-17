@@ -1,1 +1,8 @@
-This is a template readme file to enforce main default branch. Edit this file as you see fit.
+# school-project-comp.cs.300
+Datastructures & algorithms -course. Individual project, autumn -22.
+## Usage
+
+### Description
+
+
+### Learning goals
