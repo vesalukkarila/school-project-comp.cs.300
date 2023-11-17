@@ -8,7 +8,7 @@ Generate Makefile with qmake
 ```sh
 qmake -o Makefile prg1.pro
 ```
-(..or prg2.pro)
+(..alternatively prg2.pro)  
 Then build
 ```sh
 make
