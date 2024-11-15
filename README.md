@@ -4,6 +4,9 @@
 
 ## Project description
 This project, Railroads, was assignment for the COMP.CS.300 Data Structures and Algorithms course. Its primary aim is to provide hands-on practice with algorithms and data structures, particularly focusing on creating efficient implementations. The project simulates a railway system where users can input data about stations, train departures, and regions (such as municipalities or states) surrounding each station.
+
+Use instructions for application can be found at the end of assignment.pdf  
+
 ## Usage
 
 ### Run locally
