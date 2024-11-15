@@ -1,10 +1,14 @@
 # school-project-comp.cs.300
 - Datastructures & algorithms -course. Individual project, autumn -22.
 - Overall grade for the course: 4
+
+## Project description
+This project, Railroads, was assignment for the COMP.CS.300 Data Structures and Algorithms course. Its primary aim is to provide hands-on practice with algorithms and data structures, particularly focusing on creating efficient implementations. The project simulates a railway system where users can input data about stations, train departures, and regions (such as municipalities or states) surrounding each station.
 ## Usage
 
 ### Run locally
-Generate Makefile with qmake
+This project was a two-parter, prg1 and prg2.  
+Generate Makefile with qmake  
 ```sh
 qmake -o Makefile prg1.pro
 ```
@@ -14,12 +18,16 @@ Then build
 ```sh
 make
 ```
-.. and run the executable
+.. and run the executable  
+- on macOs
 ```sh
-./prg1.gui
+open prg1.app
 ```
-(if running executable failes, check Makefile´s "TARGET" to see where it places the executable.
+- non-macOs, check Makefile´s "TARGET" to see where it places the executable and run
+```sh
+./prg1
+```
 
 
 
-### Learning goals
+
